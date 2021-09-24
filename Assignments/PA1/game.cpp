@@ -290,12 +290,12 @@ int solver(int map[][WIDTH], int return_coordinates[4])
     //int highest_candidate_moves[4] = {};
     int num_candidate_moves = 0, score_gained = 0, highest_score_gained = 0;
     score_gained = considerMoves(map, candidate_moves, num_candidate_moves);
-    //cout << "bbbbb"<<endl;
+    //cout << "bbbbb" << endl;
 
-    for (int i; i < num_candidate_moves; i++)
-    {
-        cout << candidate_moves[i][0] << candidate_moves[i][1] << candidate_moves[i][2] << candidate_moves[i][3] << endl;
-    }
+    // for (int i = 0; i < num_candidate_moves; i++)
+    // {
+    //     cout << candidate_moves[i][0] << candidate_moves[i][1] << candidate_moves[i][2] << candidate_moves[i][3] << endl;
+    // }
 
     if (num_candidate_moves == 0)
     {
