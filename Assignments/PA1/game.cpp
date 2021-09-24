@@ -287,15 +287,8 @@ int considerMoves(int map[][WIDTH], int candidate_moves[][4], int &num_candidate
 int solver(int map[][WIDTH], int return_coordinates[4])
 {
     int candidate_moves[HEIGHT * (WIDTH - 1) + (HEIGHT - 1) * WIDTH][4];
-    //int highest_candidate_moves[4] = {};
     int num_candidate_moves = 0, score_gained = 0, highest_score_gained = 0;
     score_gained = considerMoves(map, candidate_moves, num_candidate_moves);
-    //cout << "bbbbb" << endl;
-
-    // for (int i = 0; i < num_candidate_moves; i++)
-    // {
-    //     cout << candidate_moves[i][0] << candidate_moves[i][1] << candidate_moves[i][2] << candidate_moves[i][3] << endl;
-    // }
 
     if (num_candidate_moves == 0)
     {
@@ -303,29 +296,27 @@ int solver(int map[][WIDTH], int return_coordinates[4])
     }
     else if (num_candidate_moves == 1)
     {
-        for (int i = 0; i < 4; i++)
-        {
-            return_coordinates[i] = candidate_moves[0][i];
-        }
+        return_coordinates[0] = candidate_moves[0][0];
+        return_coordinates[1] = candidate_moves[0][1];
+        return_coordinates[2] = candidate_moves[0][2];
+        return_coordinates[3] = candidate_moves[0][3];
+
         return score_gained;
     }
     else
     {
         int map_copy[MAX_ROWS][WIDTH] = {};
-        //cout << ".." << endl;
         for (int i = 0; i < num_candidate_moves; i++)
         {
             int current_score = 0;
             copyMap(map, map_copy, MAX_ROWS);
-            swapTiles(map_copy, candidate_moves[i][0], candidate_moves[i][1], candidate_moves[i][2], candidate_moves[i][3]);
+            swapTiles(map_copy, candidate_moves[i][0], candidate_moves[i][1], candidate_moves[i][2], candidate_moves[i][3]); // try this candidate move
             processMatches(map_copy);
-            current_score = score_gained + solver(map_copy);
-            //cout << current_score << " " << highest_score_gained << endl;
-            if (current_score > highest_score_gained)
+            current_score = score_gained + solver(map_copy); // recursion
+            if (current_score > highest_score_gained)        // get the highest score
             {
-                //cout << current_score << " " << highest_score_gained << endl;
                 highest_score_gained = current_score;
-                return_coordinates[0] = candidate_moves[i][0];
+                return_coordinates[0] = candidate_moves[i][0]; // assign related candidate moves
                 return_coordinates[1] = candidate_moves[i][1];
                 return_coordinates[2] = candidate_moves[i][2];
                 return_coordinates[3] = candidate_moves[i][3];
