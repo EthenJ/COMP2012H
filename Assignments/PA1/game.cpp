@@ -287,18 +287,16 @@ int considerMoves(int map[][WIDTH], int candidate_moves[][4], int &num_candidate
 int solver(int map[][WIDTH], int return_coordinates[4])
 {
     int candidate_moves[HEIGHT * (WIDTH - 1) + (HEIGHT - 1) * WIDTH][4];
-    int highest_candidate_moves[4] = {};
+    //int highest_candidate_moves[4] = {};
     int num_candidate_moves = 0, score_gained = 0, highest_score_gained = 0;
     score_gained = considerMoves(map, candidate_moves, num_candidate_moves);
+    //cout << "bbbbb"<<endl;
+
     for (int i; i < num_candidate_moves; i++)
     {
         cout << candidate_moves[i][0] << candidate_moves[i][1] << candidate_moves[i][2] << candidate_moves[i][3] << endl;
     }
-    return_coordinates[0] = 0;
-    return_coordinates[1] = 0;
-    return_coordinates[2] = 1;
-    return_coordinates[3] = 0;
-    /*
+
     if (num_candidate_moves == 0)
     {
         return 0;
@@ -313,25 +311,28 @@ int solver(int map[][WIDTH], int return_coordinates[4])
     }
     else
     {
+        int map_copy[MAX_ROWS][WIDTH] = {};
+        //cout << ".." << endl;
         for (int i = 0; i < num_candidate_moves; i++)
         {
             int current_score = 0;
-            int map_copy[MAX_ROWS][WIDTH] = {};
             copyMap(map, map_copy, MAX_ROWS);
             swapTiles(map_copy, candidate_moves[i][0], candidate_moves[i][1], candidate_moves[i][2], candidate_moves[i][3]);
+            processMatches(map_copy);
             current_score = score_gained + solver(map_copy);
+            //cout << current_score << " " << highest_score_gained << endl;
             if (current_score > highest_score_gained)
             {
+                //cout << current_score << " " << highest_score_gained << endl;
                 highest_score_gained = current_score;
-                highest_candidate_moves[0] = candidate_moves[i][0];
-                highest_candidate_moves[1] = candidate_moves[i][1];
-                highest_candidate_moves[2] = candidate_moves[i][2];
-                highest_candidate_moves[3] = candidate_moves[i][3];
+                return_coordinates[0] = candidate_moves[i][0];
+                return_coordinates[1] = candidate_moves[i][1];
+                return_coordinates[2] = candidate_moves[i][2];
+                return_coordinates[3] = candidate_moves[i][3];
             }
         }
         return highest_score_gained;
     }
-*/
     return 0;
 }
 
