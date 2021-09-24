@@ -223,18 +223,10 @@ void copyMap(int map[][WIDTH], int map_copy[][WIDTH], int rows_to_copy)
 /***********************************************************************
  * TODO 4: Consider and calculate the score gain for each possible move
  ***********************************************************************/
-void makeArray(int candidate_move[4], const int x1, const int y1, const int x2, const int y2)
-{
-    candidate_move[0] = x1;
-    candidate_move[1] = y1;
-    candidate_move[2] = x2;
-    candidate_move[3] = y2;
-}
 
 int considerMoves(int map[][WIDTH], int candidate_moves[][4], int &num_candidate_moves)
 {
     int max_score_gained = 0;
-    int temp_candidate_moves[HEIGHT * (WIDTH - 1) + (HEIGHT - 1) * WIDTH][4] = {};
     int temp_num_candidate_moves = 0;
     int map_copy[MAX_ROWS][WIDTH];
 
@@ -243,12 +235,9 @@ int considerMoves(int map[][WIDTH], int candidate_moves[][4], int &num_candidate
     {
         for (int col = 0; col < WIDTH - 1; col++) // left => right
         {
-            // bool matches[HEIGHT][WIDTH] = {};
-            // int score_gained = 0;
             copyMap(map, map_copy, MAX_ROWS);
             swapTiles(map_copy, col, row, col + 1, row);
             int score_gained = processMatches(map_copy);
-            int candidate_move[4];
             if (score_gained >= max_score_gained)
             {
                 if (score_gained > max_score_gained)
@@ -256,8 +245,10 @@ int considerMoves(int map[][WIDTH], int candidate_moves[][4], int &num_candidate
                     temp_num_candidate_moves = 0;
                     max_score_gained = score_gained;
                 }
-                makeArray(candidate_moves[temp_num_candidate_moves++], col, row, col + 1, row);
-                // cout << "mv " << row << col << candidate_moves[temp_num_candidate_moves - 1][0] << candidate_moves[temp_num_candidate_moves - 1][1] << candidate_moves[temp_num_candidate_moves - 1][2] << candidate_moves[temp_num_candidate_moves - 1][3] << endl;
+                candidate_moves[temp_num_candidate_moves][0] = col;
+                candidate_moves[temp_num_candidate_moves][1] = row;
+                candidate_moves[temp_num_candidate_moves][2] = col + 1;
+                candidate_moves[temp_num_candidate_moves++][3] = row;
             }
         }
     }
@@ -266,9 +257,6 @@ int considerMoves(int map[][WIDTH], int candidate_moves[][4], int &num_candidate
     {
         for (int row = 0; row < HEIGHT - 1; row++) // down => up
         {
-            // int map_copy[MAX_ROWS][WIDTH];
-            // bool matches[HEIGHT][WIDTH] = {};
-            // int score_gained = 0;
             copyMap(map, map_copy, MAX_ROWS);
             swapTiles(map_copy, col, row, col, row + 1);
             int score_gained = processMatches(map_copy);
@@ -280,7 +268,10 @@ int considerMoves(int map[][WIDTH], int candidate_moves[][4], int &num_candidate
                     temp_num_candidate_moves = 0;
                     max_score_gained = score_gained;
                 }
-                makeArray(candidate_moves[temp_num_candidate_moves++], col, row, col, row + 1);
+                candidate_moves[temp_num_candidate_moves][0] = col;
+                candidate_moves[temp_num_candidate_moves][1] = row;
+                candidate_moves[temp_num_candidate_moves][2] = col;
+                candidate_moves[temp_num_candidate_moves++][3] = row + 1;
             }
         }
     }
