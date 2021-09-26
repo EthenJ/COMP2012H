@@ -129,21 +129,15 @@ void initStateRandomly()
 
 int getNeighbourState(int row, int col)
 {
-
     //
     // TODO: task 2.1, get a decimal number repersenting the current state of the neighbours
     // Compute the state of the neighbours with respect to the given row and col
     // Wrap around the boundaries if necessary
-    //
-    // Your code here
-    //
-
-    return 0;
+    return grid[row][(col + WIDTH - 1) % WIDTH]*2*2 + grid[row][col]*2 + grid[row][(col + WIDTH + 1) % WIDTH];
 }
 
 void update()
 {
-
     //
     // TODO: task 2.2, update to the next state
     // Compute the next state according to the current state and the rule
