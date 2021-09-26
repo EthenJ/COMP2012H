@@ -203,9 +203,12 @@ int processMatches(int map[][WIDTH])
  ***********************************************************************/
 void swapTiles(int map[][WIDTH], int x1, int y1, int x2, int y2)
 {
-    map[y1][x1] = map[y1][x1] ^ map[y2][x2];
-    map[y2][x2] = map[y1][x1] ^ map[y2][x2];
-    map[y1][x1] = map[y1][x1] ^ map[y2][x2];
+    if (map[y1][x1] != map[y2][x2])
+    {
+        map[y1][x1] = map[y1][x1] ^ map[y2][x2];
+        map[y2][x2] = map[y1][x1] ^ map[y2][x2];
+        map[y1][x1] = map[y1][x1] ^ map[y2][x2];
+    }
 }
 
 // copy the contents of the first rows_to_copy rows of map to map_copy
