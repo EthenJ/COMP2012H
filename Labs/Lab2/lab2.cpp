@@ -40,10 +40,10 @@ void initRule()
 {
     //
     // TODO: task 1.1, initialize the rule
+    cout << "Please enter the rule number:" << endl;
     while (true)
     {
         // Ask the user to input the decimal rule number.
-        cout << "Please specify the number of steps" << endl;
         cin >> ruleNum;
         // Check whether the number is in between 0 and 255, inclusive
         if (ruleNum > 255 || ruleNum < 0)
@@ -67,10 +67,10 @@ void initStateFromInput()
     //
     // TODO: task 1.2, initialize the initial state from user input
     int number_of_cells_alive = -1;
+    cout << "Please enter the number of cells alive in the initial state:" << endl;
     while (true)
     {
         // Ask the user to input the number of initially living cells and their positions
-        cout << "Please enter the number of cells alive in the initial state:" << endl;
         cin >> number_of_cells_alive;
         if (number_of_cells_alive < 1 || number_of_cells_alive > WIDTH)
         {
@@ -80,10 +80,11 @@ void initStateFromInput()
         }
         break;
     }
+
     int col = 0, N = 0;
+    cout << "Please enter the column at which the cells are alive:" << endl;
     while (N < number_of_cells_alive)
     {
-        cout << "Please enter the column at which the cells are alive:" << endl;
         cin >> col;
         if (col < 0 || col > WIDTH - 1)
         {
@@ -106,10 +107,10 @@ void initStateRandomly()
     //
     // TODO: task 1.3, initialize the initial state randomly
     double fill_rate;
+    cout << "Please enter the fill rate:" << endl;
     while (true)
     {
         // Ask the user for a fill rate and use it as the probability to generate random 0 and 1s
-        cout << "Please enter the fill rate:" << endl;
         cin >> fill_rate;
         if (fill_rate < 0.0 || fill_rate > 1.0)
         {
@@ -133,31 +134,52 @@ int getNeighbourState(int row, int col)
     // TODO: task 2.1, get a decimal number repersenting the current state of the neighbours
     // Compute the state of the neighbours with respect to the given row and col
     // Wrap around the boundaries if necessary
-    return grid[row][(col + WIDTH - 1) % WIDTH]*2*2 + grid[row][col]*2 + grid[row][(col + WIDTH + 1) % WIDTH];
+    return grid[row][(col + WIDTH - 1) % WIDTH] * 2 * 2 + grid[row][col] * 2 + grid[row][(col + WIDTH + 1) % WIDTH];
 }
 
 void update()
 {
     //
     // TODO: task 2.2, update to the next state
-    // Compute the next state according to the current state and the rule
-    // Update grid[][], curRow and curStep correspondingly
+    int nexRow = (curRow + 1) % HEIGHT;
+    for (int x = 0; x < WIDTH; x++)
+    {
+        // Compute the next state according to the current state and the rule
+        // Update grid[][], curRow and curStep correspondingly
+        grid[nexRow][x] = rule[getNeighbourState(curRow, x)];
+    }
+    curStep++;
     // Wrap around the boundaries if needed
-    //
-    // Your code here
-    //
+    curRow = nexRow;
 }
 
 void getState(int step)
 {
-
     //
     // TODO: task 2.3, get the state of the automaton after given steps
     // Modify grid[][] so that its content represents the state of the automaton
     // after the given number of steps
-    //
-    // Your code here
-    //
+    if (step < curStep)
+    {
+        curStep = 0;
+        curRow = 0;
+        for (int y = 1; y < HEIGHT; y++)
+        {
+            for (int x = 0; x < WIDTH; x++)
+            {
+                grid[y][x] = 0;
+            }
+        }
+        for (int i = 0; i < WIDTH; i++)
+        {
+            grid[0][i] = initialState[i];
+        }
+    }
+
+    while (curStep < step)
+    {
+        update();
+    }
 }
 
 void initState()
