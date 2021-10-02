@@ -281,6 +281,8 @@ int considerMoves(int map[][WIDTH], int candidate_moves[][4], int &num_candidate
 
     num_candidate_moves = temp_num_candidate_moves;
 
+    cout << max_score_gained << endl;
+
     return max_score_gained;
 }
 
