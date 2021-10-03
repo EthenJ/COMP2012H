@@ -6,7 +6,7 @@ CXX := g++
 CXXFLAGS := -std=c++17 -Wall -Wextra -pedantic -Iinclude
 
 ifeq (Windows_NT, $(OS))
-RM := del
+RM := del .\
 else
 RM := rm -f
 endif
