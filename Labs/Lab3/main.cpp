@@ -104,7 +104,9 @@ void task3Tests() {
 
     for (int i = 0; i < 16; i += 2) {
         enqueue(queue, generateFrame(i));
+        //printQueue(queue);
         enqueue(queue, generateFrame(i + 1));
+        //printQueue(queue);
         dequeue(queue);
         printQueue(queue);
     }
@@ -121,7 +123,7 @@ void task3Tests() {
 
     enqueue(queue, nullptr);
     enqueue(queue, nullptr);
-
+    
     for (int i = 0; i < 16; ++i) {
         dequeue(queue);
         dequeue(queue);
