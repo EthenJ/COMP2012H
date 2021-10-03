@@ -21,15 +21,26 @@ List *list_new()
 }
 
 void list_push_back(List *list, Blob *blob)
-{   // the blob is the last one in the list;
+{                                            // the blob is the last one in the list;
     (*((*((*list).head)).prev)).next = blob; // it should be the next of the previous last blob
     (*blob).prev = ((*((*list).head)).prev); // the prev of the blob should be the previous last blob
-    (*((*list).head)).prev = blob; // the prev of the head should be the blob
-    (*blob).next = (*list).head; // the next one of the blob should be the head of the list
+    (*((*list).head)).prev = blob;           // the prev of the head should be the blob
+    (*blob).next = (*list).head;             // the next one of the blob should be the head of the list
 }
 
 Blob *list_find_name(const List *list, const string &name)
 {
+    Blob *this_blob = (*((*list).head)).next;
+
+    while (this_blob != (*list).head) // search until reach the head
+    {
+        if ((*this_blob).name == name) // if the blob with the wanted name is found
+        {
+            return this_blob; // return the pointer to the blob
+        }
+        this_blob = (*this_blob).next; // search in the next blob
+    }
+    // if no blobs were found.
     return nullptr;
 }
 
