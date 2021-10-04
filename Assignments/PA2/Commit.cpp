@@ -41,41 +41,157 @@ Blob *list_find_name(const List *list, const string &name)
     return nullptr;
 }
 
-Blob *list_put(List *list, const string &name, const string &ref)
+Blob *list_put(List *list, const string &name, const string &ref) // Put a blob with the given name and content (ref or commit) to the linked list.
 {
-    return nullptr;
+    Blob *new_blob = list_find_name(list, name);
+    if (new_blob != nullptr) //If a blob with the same name exists in the linked list,
+    {
+        (*new_blob).ref = ref; //update the blob by replacing the content (ref or commit) with the given content (ref or commit).
+        return new_blob;
+    }
+
+    //If no blobs with the same name exists in the linked list
+    //create a new blob with the given content (ref or commit)
+    new_blob = new Blob;
+    (*new_blob).name = name;
+    (*new_blob).ref = ref;
+    //and insert it to the linked list with the name following ascending lexicographic order.
+
+    if (name < (*((*((*list).head)).next)).name) // head < new < 1st
+    {
+        (*new_blob).prev = (*list).head;             // head <- new
+        (*new_blob).next = (*((*list).head)).next;   // new -> 1st
+        (*((*((*list).head)).next)).prev = new_blob; // new <- 1st
+        (*((*list).head)).next = new_blob;           // head -> new
+        return new_blob;
+    }
+
+    for (Blob *this_blob = (*((*list).head)).next; this_blob != (*((*list).head)).prev; this_blob = (*this_blob).next)
+    {
+        if (((*this_blob).name < name) && (name < (*((*this_blob).next)).name)) // this < new < next
+        {
+            (*new_blob).prev = this_blob;           // this <- new
+            (*new_blob).next = (*this_blob).next;   // new -> next
+            (*((*this_blob).next)).prev = new_blob; // new <- next
+            (*this_blob).next = new_blob;           // this -> new
+            return new_blob;
+        }
+    }
+
+    // this => last
+    (*new_blob).prev = (*((*list).head)).prev;   // last <- new
+    (*new_blob).next = (*list).head;             // new -> head
+    (*((*((*list).head)).prev)).next = new_blob; // last -> new
+    (*((*list).head)).prev = new_blob;           // new <- head
+    return new_blob;
 }
 
 Blob *list_put(List *list, const string &name, Commit *commit)
 {
-    return nullptr;
+    Blob *new_blob = list_find_name(list, name);
+    if (new_blob != nullptr) //If a blob with the same name exists in the linked list,
+    {
+        (*new_blob).commit = commit; //update the blob by replacing the content (ref or commit) with the given content (ref or commit).
+        return new_blob;
+    }
+
+    //If no blobs with the same name exists in the linked list
+    //create a new blob with the given content (ref or commit)
+    new_blob = new Blob;
+    (*new_blob).name = name;
+    (*new_blob).commit = commit;
+    //and insert it to the linked list with the name following ascending lexicographic order.
+
+    if (name < (*((*((*list).head)).next)).name) // head < new < 1st
+    {
+        (*new_blob).prev = (*list).head;             // head <- new
+        (*new_blob).next = (*((*list).head)).next;   // new -> 1st
+        (*((*((*list).head)).next)).prev = new_blob; // new <- 1st
+        (*((*list).head)).next = new_blob;           // head -> new
+        return new_blob;
+    }
+
+    for (Blob *this_blob = (*((*list).head)).next; this_blob != (*((*list).head)).prev; this_blob = (*this_blob).next)
+    {
+        if (((*this_blob).name < name) && (name < (*((*this_blob).next)).name)) // this < new < next
+        {
+            (*new_blob).prev = this_blob;           // this <- new
+            (*new_blob).next = (*this_blob).next;   // new -> next
+            (*((*this_blob).next)).prev = new_blob; // new <- next
+            (*this_blob).next = new_blob;           // this -> new
+            return new_blob;
+        }
+    }
+
+    // this => last
+    (*new_blob).prev = (*((*list).head)).prev;   // last <- new
+    (*new_blob).next = (*list).head;             // new -> head
+    (*((*((*list).head)).prev)).next = new_blob; // last -> new
+    (*((*list).head)).prev = new_blob;           // new <- head
+    return new_blob;
 }
 
 bool list_remove(List *list, const string &target)
 {
-    return false;
+    Blob *blob_remove = list_find_name(list, target);
+    if (blob_remove == nullptr)
+    {
+        return false;
+    }
+    (*((*blob_remove).prev)).next = (*blob_remove).next;
+    (*((*blob_remove).next)).prev = (*blob_remove).prev;
+    delete blob_remove;
+    return true;
 }
 
 int list_size(const List *list)
 {
-    return 0;
+    int size = 0;
+    for (Blob *this_blob = (*((*list).head)).next; this_blob != (*list).head; this_blob = (*this_blob).next) // search until reach the head
+    {
+        size++;
+    }
+    return size;
 }
 
 void list_clear(List *list)
 {
+    for (Blob *this_blob = (*((*list).head)).next, *next_blob; this_blob != (*list).head; this_blob = next_blob) // search until reach the head
+    {
+        next_blob = (*this_blob).next;
+        delete this_blob;
+        this_blob = nullptr;
+    }
+    (*((*list).head)).next = (*list).head;
+    (*((*list).head)).prev = (*list).head;
 }
 
 void list_delete(List *list)
 {
+    list_clear(list);
+    delete (*list).head;
+    delete list;
+    list = nullptr;
 }
 
-void list_replace(List *list, const List *another)
+void list_replace(List *list, const List *another) //Replace the linked list with the given another linked list, maintaining the order of blobs. Deep copy the blobs in the process.
 {
+    list_clear(list);
+    list = list_copy(another);
 }
 
 List *list_copy(const List *list)
 {
-    return nullptr;
+    List *copied_list = list_new();
+    for (Blob *this_blob = (*((*list).head)).next; this_blob != (*list).head; this_blob = (*this_blob).next) // search until reach the head
+    {
+        Blob *copied_blob = new Blob;
+        copied_blob->name = this_blob->name;
+        copied_blob->ref = this_blob->ref;
+        copied_blob->commit = this_blob->commit;
+        list_push_back(copied_list, copied_blob);
+    }
+    return copied_list;
 }
 
 // Part 2: Gitlite Commands
