@@ -21,11 +21,11 @@ List *list_new()
 }
 
 void list_push_back(List *list, Blob *blob)
-{                                            // the blob is the last one in the list;
-    (*((*((*list).head)).prev)).next = blob; // it should be the next of the previous last blob
-    (*blob).prev = ((*((*list).head)).prev); // the prev of the blob should be the previous last blob
-    (*((*list).head)).prev = blob;           // the prev of the head should be the blob
-    (*blob).next = (*list).head;             // the next one of the blob should be the head of the list
+{                                            // the blob is the last one in the list
+    (*blob).next = (*list).head;             // blob -> head
+    (*blob).prev = ((*((*list).head)).prev); // last <- blob
+    (*((*((*list).head)).prev)).next = blob; // last -> blob
+    (*((*list).head)).prev = blob;           // blob <- head
 }
 
 Blob *list_find_name(const List *list, const string &name)
@@ -124,10 +124,7 @@ Blob *list_put(List *list, const string &name, Commit *commit)
     }
 
     // this => last
-    (*new_blob).prev = (*((*list).head)).prev;   // last <- new
-    (*new_blob).next = (*list).head;             // new -> head
-    (*((*((*list).head)).prev)).next = new_blob; // last -> new
-    (*((*list).head)).prev = new_blob;           // new <- head
+    list_push_back(list, new_blob);
     return new_blob;
 }
 
@@ -141,6 +138,7 @@ bool list_remove(List *list, const string &target)
     (*((*blob_remove).prev)).next = (*blob_remove).next;
     (*((*blob_remove).next)).prev = (*blob_remove).prev;
     delete blob_remove;
+    blob_remove = nullptr;
     return true;
 }
 
@@ -177,20 +175,20 @@ void list_delete(List *list)
 void list_replace(List *list, const List *another) //Replace the linked list with the given another linked list, maintaining the order of blobs. Deep copy the blobs in the process.
 {
     list_clear(list);
-    list = list_copy(another);
-}
-
-List *list_copy(const List *list)
-{
-    List *copied_list = list_new();
-    for (Blob *this_blob = (*((*list).head)).next; this_blob != (*list).head; this_blob = (*this_blob).next) // search until reach the head
+    for (Blob *this_blob = (*((*another).head)).next; this_blob != (*another).head; this_blob = (*this_blob).next) // search until reach the head
     {
         Blob *copied_blob = new Blob;
         copied_blob->name = this_blob->name;
         copied_blob->ref = this_blob->ref;
         copied_blob->commit = this_blob->commit;
-        list_push_back(copied_list, copied_blob);
+        list_push_back(list, copied_blob);
     }
+}
+
+List *list_copy(const List *list)
+{
+    List *copied_list = list_new();
+    list_replace(copied_list,list);
     return copied_list;
 }
 
