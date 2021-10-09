@@ -290,24 +290,24 @@ int update_game(char option)
         // cout << tail->x << " : " << tail->y << endl;
         // cout << tail->next->x << " : " << tail->next->y << endl;
     }
-    
+
     // If the snake head is out of bounds (hits the wall), the player loses. Returns 0 (the index of the head of the snake)
     // if that happens.
     snake_head = get_head(*snake_head);
     // cout << head->x << " : " << head->y << endl;
-    if (snake_head->next != nullptr)
-    {
-        // SnakeBody *tail = get_tail(*snake_head);
-        // cout << tail->x << " " << tail->y << endl;
-        // cout << tail->next->x << tail->next->y << endl;
-        // cout << tail->next->next->x << tail->next->next->y << endl;
-        if ((snake_head->x < 0) || (snake_head->x > GRID_SIZE - 1) || (snake_head->y < 0) || (snake_head->y > GRID_SIZE - 1))
-            return 0;
-    }
+    // if (snake_head->next != nullptr)
+    // {
+    // SnakeBody *tail = get_tail(*snake_head);
+    // cout << tail->x << " " << tail->y << endl;
+    // cout << tail->next->x << tail->next->y << endl;
+    // cout << tail->next->next->x << tail->next->next->y << endl;
+    if ((snake_head->x < 0) || (snake_head->x > GRID_SIZE - 1) || (snake_head->y < 0) || (snake_head->y > GRID_SIZE - 1))
+        return 0;
+    // }
 
     // If the snake head hits its body, the player loses.
     // If that happens, return the index of the body which is currently intersecting the head.
-    int i = 0;
+    int i = 1;
     for (SnakeBody *body = snake_head->next; body != nullptr; body = body->next, i++)
     {
         if ((snake_head->x == body->x) && (snake_head->y == body->y))
@@ -331,7 +331,6 @@ int update_game(char option)
             tail->x = tail_x;
             tail->y = tail_y;
             insert_into_next(*get_tail(*snake_head), tail);
-            snake_head = get_head(*snake_head);
             unique_coordinates(fruits[i][0], fruits[i][1]);
             score++;
             break;
@@ -341,6 +340,7 @@ int update_game(char option)
     //     cout << head->x << " m " << head->y << endl;
     //     cout << tail->x << " n " << tail->y << endl;
     // Snake hasn't died yet here, return -1.
+    snake_head = get_head(*snake_head);
     return -1;
     // END OF YOUR IMPLEMENTATION
 }
