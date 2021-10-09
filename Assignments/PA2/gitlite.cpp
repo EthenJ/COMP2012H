@@ -47,59 +47,83 @@ const string msg_status_modified = " (modified)";
 
 const string status_untracked_files_header = "=== Untracked Files ===";
 
-string get_merge_commit_message(const Blob *given_branch, const Blob *current_branch) {
+string get_merge_commit_message(const Blob *given_branch, const Blob *current_branch)
+{
     string message("Merged " + given_branch->name + " into " + current_branch->name + ".");
     return message;
 }
 
-void init(Blob *&current_branch, List *&branches, List *&staged_files, List *&tracked_files, Commit *&head_commit) {
+void init(Blob *&current_branch, List *&branches, List *&staged_files, List *&tracked_files, Commit *&head_commit)
+{
+    // 1. Initialize the linked lists: branches, staged_files, tracked_files.
+    branches = list_new();
+    // 2. Create the initial commit with message initial commit.
+    head_commit = new Commit;
+    head_commit->message = msg_initial_commit;
+    // Set the time string and compute the hash. This commit tracks no files (initialize commit->tracked_files as well) and has no parents.
+    head_commit->time = get_time_string();
+    hash;
+    head_commit->parent = nullptr;
+    // 3. Create a branch called master and set it as the current branch.
+    // Add the initial commit to the branch. Set the head commit of the repository as well.
+    
+    
 
 }
 
-bool add(const string &filename, List *staged_files, List *tracked_files, const Commit *head_commit) {
+bool add(const string &filename, List *staged_files, List *tracked_files, const Commit *head_commit)
+{
     return false;
 }
 
-bool commit(const string &message, Blob *current_branch, List *staged_files, List *tracked_files, Commit *&head_commit) {
+bool commit(const string &message, Blob *current_branch, List *staged_files, List *tracked_files, Commit *&head_commit)
+{
     return false;
 }
 
-bool remove(const string &filename, List* staged_files, List *tracked_files, const Commit *head_commit) {
+bool remove(const string &filename, List *staged_files, List *tracked_files, const Commit *head_commit)
+{
     return false;
 }
 
-void log(const Commit *head_commit) {
-
+void log(const Commit *head_commit)
+{
 }
 
 void status(const Blob *current_branch, const List *branches, const List *staged_files, const List *tracked_files,
-            const List *cwd_files, const Commit *head_commit) {
-
+            const List *cwd_files, const Commit *head_commit)
+{
 }
 
-bool checkout(const string &filename, Commit *commit) {
+bool checkout(const string &filename, Commit *commit)
+{
     return false;
 }
 
 bool checkout(const string &branch_name, Blob *&current_branch, const List *branches, List *staged_files,
-              List *tracked_files, const List *cwd_files, Commit *&head_commit) {
+              List *tracked_files, const List *cwd_files, Commit *&head_commit)
+{
     return false;
 }
 
 bool reset(Commit *commit, Blob *current_branch, List *staged_files, List *tracked_files, const List *cwd_files,
-           Commit *&head_commit) {
+           Commit *&head_commit)
+{
     return false;
 }
 
-Blob *branch(const string &branch_name, List *branches, Commit *head_commit) {
+Blob *branch(const string &branch_name, List *branches, Commit *head_commit)
+{
     return nullptr;
 }
 
-bool remove_branch(const string &branch_name, Blob *current_branch, List *branches) {
+bool remove_branch(const string &branch_name, Blob *current_branch, List *branches)
+{
     return false;
 }
 
 bool merge(const string &branch_name, Blob *&current_branch, List *branches, List *staged_files, List *tracked_files,
-           const List *cwd_files, Commit *&head_commit) {
+           const List *cwd_files, Commit *&head_commit)
+{
     return false;
 }
