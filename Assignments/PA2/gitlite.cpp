@@ -216,17 +216,14 @@ void status(const Blob *current_branch, const List *branches, const List *staged
 
     // Staged Files: Display the filenames of all files that are staged for addition.
     cout << status_staged_files_header << endl;
-    if (staged_files->head->next != nullptr)
+    for (Blob *this_staged_file = staged_files->head->next;
+         this_staged_file != staged_files->head; this_staged_file = this_staged_file->next)
     {
-        for (Blob *this_staged_file = staged_files->head->next;
-             this_staged_file != staged_files->head; this_staged_file = this_staged_file->next)
+        if (is_file_exist(this_staged_file->name))
         {
-            if (is_file_exist(this_staged_file->name))
+            if (this_staged_file->ref == get_sha1(this_staged_file->name))
             {
-                if (this_staged_file->ref == get_sha1(this_staged_file->name))
-                {
-                    cout << this_staged_file->name << endl;
-                }
+                cout << this_staged_file->name << endl;
             }
         }
     }
@@ -234,17 +231,15 @@ void status(const Blob *current_branch, const List *branches, const List *staged
 
     // Removed Files: Display the filenames of all files that are staged for removal.
     cout << status_removed_files_header << endl;
-    if (head_commit->tracked_files->head->next != nullptr)
+    for (Blob *this_committed_file = head_commit->tracked_files->head->next;
+         this_committed_file != head_commit->tracked_files->head; this_committed_file = this_committed_file->next)
     {
-        for (Blob *this_committed_file = head_commit->tracked_files->head->next;
-             this_committed_file != head_commit->tracked_files->head; this_committed_file = this_committed_file->next)
+        if (list_find_name(tracked_files, this_committed_file->name) == nullptr)
         {
-            if (list_find_name(tracked_files, this_committed_file->name) == nullptr)
-            {
-                cout << this_committed_file->name << endl;
-            }
+            cout << this_committed_file->name << endl;
         }
     }
+
     cout << endl;
 
     // Modifications Not Staged For Commit: Display the filenames for the following files.
@@ -254,69 +249,58 @@ void status(const Blob *current_branch, const List *branches, const List *staged
 
     // 1. Unstaged files that are tracked in the head commit of the repository,
     // but the content recorded in the commit is different with the content in the current working directory (CWD).
-    if (head_commit->tracked_files->head->next != nullptr)
+    for (Blob *this_committed_file = head_commit->tracked_files->head->next;
+         this_committed_file != head_commit->tracked_files->head; this_committed_file = this_committed_file->next)
     {
-        for (Blob *this_committed_file = head_commit->tracked_files->head->next;
-             this_committed_file != head_commit->tracked_files->head; this_committed_file = this_committed_file->next)
+        // Unstaged files that are tracked in the head commit of the repository
+        if (list_find_name(staged_files, this_committed_file->name) == nullptr)
         {
-            // Unstaged files that are tracked in the head commit of the repository
-            if (list_find_name(staged_files, this_committed_file->name) == nullptr)
+            // but the content recorded in the commit is different with the content in the current working directory (CWD).
+            if (is_file_exist(this_committed_file->name))
             {
-                // but the content recorded in the commit is different with the content in the current working directory (CWD).
-                if (is_file_exist(this_committed_file->name))
+                if (this_committed_file->ref != get_sha1(this_committed_file->name))
                 {
-                    if (this_committed_file->ref != get_sha1(this_committed_file->name))
-                    {
-                        cout << this_committed_file->name << msg_status_modified << endl;
-                    }
+                    cout << this_committed_file->name << msg_status_modified << endl;
                 }
             }
         }
     }
 
     // 2. Files that were staged for addition, but the content recorded in the staging area is different with the content in CWD.
-    if (staged_files->head->next != nullptr)
+    for (Blob *this_staged_file = staged_files->head->next;
+         this_staged_file != staged_files->head; this_staged_file = this_staged_file->next)
     {
-        for (Blob *this_staged_file = staged_files->head->next;
-             this_staged_file != staged_files->head; this_staged_file = this_staged_file->next)
+        if (is_file_exist(this_staged_file->name))
         {
-            if (is_file_exist(this_staged_file->name))
+            if (this_staged_file->ref != get_sha1(this_staged_file->name))
             {
-                if (this_staged_file->ref != get_sha1(this_staged_file->name))
-                {
-                    cout << this_staged_file->name << msg_status_modified << endl;
-                }
+                cout << this_staged_file->name << msg_status_modified << endl;
             }
         }
     }
 
     // 3. Files staged for addition but deleted in CWD.
-    if (staged_files->head->next != nullptr)
+    for (Blob *this_staged_file = staged_files->head->next;
+         this_staged_file != staged_files->head; this_staged_file = this_staged_file->next)
     {
-        for (Blob *this_staged_file = staged_files->head->next;
-             this_staged_file != staged_files->head; this_staged_file = this_staged_file->next)
+        if (!(is_file_exist(this_staged_file->name)))
         {
-            if (!(is_file_exist(this_staged_file->name)))
-            {
-                cout << this_staged_file->name << msg_status_deleted << endl;
-            }
+            cout << this_staged_file->name << msg_status_deleted << endl;
         }
     }
 
     // 4. Files not staged for removal but tracked in the head commit of the repository and deleted in CWD.
-    if (head_commit->tracked_files->head->next != nullptr)
-    { // tracked in the head commit
-        for (Blob *this_committed_file = head_commit->tracked_files->head->next;
-             this_committed_file != head_commit->tracked_files->head; this_committed_file = this_committed_file->next)
+    // tracked in the head commit
+    for (Blob *this_committed_file = head_commit->tracked_files->head->next;
+         this_committed_file != head_commit->tracked_files->head; this_committed_file = this_committed_file->next)
+    {
+        // Files not staged for removal
+        if (list_find_name(tracked_files, this_committed_file->name) != nullptr)
         {
-            // Files not staged for removal
-            if (list_find_name(tracked_files, this_committed_file->name) != nullptr)
+            // but the content recorded in the commit is different with the content in the current working directory (CWD).
+            if (!(is_file_exist(this_committed_file->name)))
             {
-                // but the content recorded in the commit is different with the content in the current working directory (CWD).
-                if (!(is_file_exist(this_committed_file->name)))
-                {
-                    cout << this_committed_file->name << msg_status_deleted << endl;
-                }
+                cout << this_committed_file->name << msg_status_deleted << endl;
             }
         }
     }
@@ -325,14 +309,11 @@ void status(const Blob *current_branch, const List *branches, const List *staged
 
     // Untracked Files: Files exist in CWD but not currently tracked by the repository.
     cout << status_untracked_files_header << endl;
-    if (cwd_files->head->next != nullptr)
+    for (Blob *cwd_file = cwd_files->head->next; cwd_file != cwd_files->head; cwd_file = cwd_file->next)
     {
-        for (Blob *cwd_file = cwd_files->head->next; cwd_file != cwd_files->head; cwd_file = cwd_file->next)
+        if (list_find_name(tracked_files, cwd_file->name) == nullptr)
         {
-            if (list_find_name(tracked_files, cwd_file->name) == nullptr)
-            {
-                cout << cwd_file->name << endl;
-            }
+            cout << cwd_file->name << endl;
         }
     }
     cout << endl;
@@ -342,12 +323,45 @@ void status(const Blob *current_branch, const List *branches, const List *staged
 
 bool checkout(const string &filename, Commit *commit)
 {
+    Blob *committed_file = list_find_name(commit->tracked_files, filename);
+    // 1. Failure check:
+    //      If commit is nullptr, then the wrapper function cannot find the commit with the commit id.
+    if (commit == nullptr)
+    {
+        //       Print No commit with that id exists. and return false.
+        cout << msg_commit_does_not_exist << endl;
+        return false;
+    }
+
+    //      If the file is not tracked by the commit,
+    else if (committed_file == nullptr)
+    {
+        //       print File does not exist in that commit. and return false.
+        cout << msg_file_does_not_exist << endl;
+        return false;
+    }
+
+    // 2. Take the version of the file as it exists in the given commit
+    //  and write the content to the current working directory. Overwrite any existing file.
+    write_file(filename, committed_file->ref);
+
+    // 3. No need to update the currently tracked files of the repository and the staging area. Return true.
     return false;
 }
 
 bool checkout(const string &branch_name, Blob *&current_branch, const List *branches, List *staged_files,
               List *tracked_files, const List *cwd_files, Commit *&head_commit)
+
 {
+    // 1. Failure check:
+    //      If the given branch does not exist, print A branch with that name does not exist. and return false.
+    //      If the given branch is the current branch, print No need to checkout the current branch. and return false.
+    //      If there exists untracked files in the current working directory that would be overwritten (see below for the files that would be overwritten), print There is an untracked file in the way; delete it, or add and commit it first. and return false.
+    // 2. Take all files in the head commit of the branch and write the content of them to the current working directory. Overwrite any existing files.
+    // 3. Any files that are tracked in the head commit of the repository but not the head commit of the given branch are deleted.
+    // 4. Set the currently tracked files of the repository to those that are tracked by the head commit of the given branch. Clear the staging area as well.
+    // 5. The given branch becomes the current branch. Also update the head commit of the repository.
+    // 6. Return true.
     return false;
 }
 
