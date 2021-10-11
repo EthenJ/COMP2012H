@@ -346,7 +346,7 @@ bool checkout(const string &filename, Commit *commit)
     write_file(filename, committed_file->ref);
 
     // 3. No need to update the currently tracked files of the repository and the staging area. Return true.
-    return false;
+    return true;
 }
 
 bool checkout(const string &branch_name, Blob *&current_branch, const List *branches, List *staged_files,
@@ -355,6 +355,11 @@ bool checkout(const string &branch_name, Blob *&current_branch, const List *bran
 {
     // 1. Failure check:
     //      If the given branch does not exist, print A branch with that name does not exist. and return false.
+    if (list_find_name(branches, branch_name) == nullptr)
+    {
+        cout << msg_branch_does_not_exist << endl;
+        return false;
+    }
     //      If the given branch is the current branch, print No need to checkout the current branch. and return false.
     //      If there exists untracked files in the current working directory that would be overwritten (see below for the files that would be overwritten), print There is an untracked file in the way; delete it, or add and commit it first. and return false.
     // 2. Take all files in the head commit of the branch and write the content of them to the current working directory. Overwrite any existing files.
