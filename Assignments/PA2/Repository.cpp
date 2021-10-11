@@ -291,9 +291,11 @@ bool Repository::merge(const std::string &branch_name) {
             new_commit.commit();
             write_content(REFS / path(current_branch->name), new_commit.commit_id);
             commits.insert({new_commit.commit_id, head_commit});
+            flush_staged_changes();
         }
         return true;
     }
+    list_delete(filenames);
     return false;
 }
 
