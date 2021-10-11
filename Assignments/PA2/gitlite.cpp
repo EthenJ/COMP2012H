@@ -118,13 +118,18 @@ bool commit(const string &message, Blob *current_branch, List *staged_files, Lis
     {
         if (head_commit->tracked_files->head->next != nullptr)
         {
+            bool staged_for_removal = false;
             for (Blob *this_file = head_commit->tracked_files->head->next;
                  this_file != head_commit->tracked_files->head; this_file = this_file->next)
             {
-                if (list_find_name(tracked_files, this_file->name) != nullptr) // not staged for removal,
+                if (list_find_name(tracked_files, this_file->name) == nullptr) // staged for removal,
                 {
-                    continue;
+                    staged_for_removal = true;
+                    break;
                 }
+            }
+            if (!(staged_for_removal))
+            {
                 // print No changes added to the commit. and return false.
                 cout << msg_no_changes_added << endl;
                 return false;
@@ -186,6 +191,7 @@ void log(const Commit *head_commit)
     // by following the parent commit (ignore second parents).
     cout << "===" << endl;
     commit_print(head_commit);
+    cout << endl;
     cout << endl;
     if (head_commit->parent != nullptr)
     {
