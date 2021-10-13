@@ -30,9 +30,9 @@ void list_push_back(List *list, Blob *blob)
 
 Blob *list_find_name(const List *list, const string &name)
 {
-    for (Blob *this_blob = (*((*list).head)).next; this_blob != (*list).head; this_blob = (*this_blob).next) // search until reach the head
+    for (Blob *this_blob = list->head->next; this_blob != list->head; this_blob = this_blob->next) // search until reach the head
     {
-        if ((*this_blob).name == name) // if the blob with the wanted name is found
+        if (this_blob->name == name) // if the blob with the wanted name is found
         {
             return this_blob; // return the pointer to the blob
         }

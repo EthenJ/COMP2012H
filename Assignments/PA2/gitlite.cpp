@@ -372,32 +372,31 @@ bool checkout(const string &branch_name, Blob *&current_branch, const List *bran
 {
     Blob *target_branch = list_find_name(branches, branch_name);
     // 1. Failure check:
-
     //      If the given branch does not exist, print A branch with that name does not exist. and return false.
     if (target_branch == nullptr)
     {
         cout << msg_branch_does_not_exist << endl;
         return false;
     }
-
     //      If the given branch is the current branch, print No need to checkout the current branch. and return false.
-    else if (branch_name == current_branch->name)
+    if (branch_name == current_branch->name)
     {
         cout << msg_checkout_current << endl;
         return false;
     }
 
-    //      If there exists untracked files in the current working directory that would be overwritten
-    for (Blob *this_file = target_branch->commit->tracked_files->head->next;
-         this_file != target_branch->commit->tracked_files->head; this_file = this_file->next)
+    //  If there exists untracked files in the current working directory that would be overwritten
+    //  (see below for the files that would be overwritten), print There is an untracked file in the way;
+    //  delete it, or add and commit it first. and return false.
+    for (Blob *cwd_file = cwd_files->head->next; cwd_file != cwd_files->head; cwd_file = cwd_file->next)
     {
-        Blob *cwd_file = list_find_name(cwd_files, this_file->name);
-        if (this_file->ref != cwd_file->ref) // file to be overwritten
+        string ref = get_sha1(cwd_file->name);
+        Blob *tracked_file = list_find_name(tracked_files, cwd_file->name);
+        if (tracked_file == nullptr) // untracked file
         {
-            if (cwd_file->ref != list_find_name(head_commit->tracked_files, this_file->name)->ref) // different with the comitted one
+            Blob *target_file = list_find_name(target_branch->commit->tracked_files, cwd_file->name);
+            if ((target_file != nullptr) && (target_file->ref != ref))
             {
-                //      (see below for the files that would be overwritten), print There is an untracked file in the way;
-                //      delete it, or add and commit it first. and return false.
                 cout << msg_untracked_file << endl;
                 return false;
             }
@@ -406,6 +405,7 @@ bool checkout(const string &branch_name, Blob *&current_branch, const List *bran
 
     // 2. Take all files in the head commit of the branch and write the content of them to the current working directory.
     // Overwrite any existing files.
+
     for (Blob *this_file = target_branch->commit->tracked_files->head->next;
          this_file != target_branch->commit->tracked_files->head; this_file = this_file->next)
     {
@@ -453,16 +453,15 @@ bool reset(Commit *commit, Blob *current_branch, List *staged_files, List *track
 
     //      If there exists untracked files in the current working directory that would be overwritten (see below for the files that would be overwritten),
     //          print There is an untracked file in the way; delete it, or add and commit it first. and return false.
-    for (Blob *this_file = commit->tracked_files->head->next;
-         this_file != commit->tracked_files->head; this_file = this_file->next)
+    for (Blob *cwd_file = cwd_files->head->next; cwd_file != cwd_files->head; cwd_file = cwd_file->next)
     {
-        Blob *cwd_file = list_find_name(cwd_files, this_file->name);
-        if (this_file->ref != cwd_file->ref) // file to be overwritten
+        string ref = get_sha1(cwd_file->name);
+        Blob *committed_file = list_find_name(current_branch->commit->tracked_files, cwd_file->name);
+        if ((committed_file == nullptr) || committed_file->ref != ref) // untracked file
         {
-            if (cwd_file->ref != list_find_name(head_commit->tracked_files, this_file->name)->ref) // different with the comitted one
+            Blob *target_file = list_find_name(commit->tracked_files, committed_file->name);
+            if (target_file != nullptr && target_file->ref != ref)
             {
-                //      (see below for the files that would be overwritten), print There is an untracked file in the way;
-                //      delete it, or add and commit it first. and return false.
                 cout << msg_untracked_file << endl;
                 return false;
             }
@@ -508,7 +507,7 @@ Blob *branch(const string &branch_name, List *branches, Commit *head_commit)
     if (list_find_name(branches, branch_name) != nullptr)
     {
         //      print A branch with that name already exists. and return nullptr.
-        cout << msg_branch_does_not_exist << endl;
+        cout << msg_branch_exists << endl;
         return nullptr;
     }
 
@@ -557,11 +556,7 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
         return false;                      // return false
     }
     //      If there exists uncommitted changes, print You have uncommitted changes. and return false.
-    else if()
-
-
-
-
+    // else if()
 
     // 2. Otherwise, proceed to compute the split point of the current branch and the given branch.
     //  The split point is a latest common ancestor of the head commit of the current branch and the head commit of the given branch:

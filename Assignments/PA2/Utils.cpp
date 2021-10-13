@@ -69,7 +69,7 @@ void add_conflict_marker(const std::string &filename, const std::string &ref) {
 
 bool write_file(const std::string &filename, const std::string &ref) {
     path gitlite = filesystem::current_path() / path(".gitlite");
-    path src = gitlite / path("BLOBS") / path(ref);
+    path src = gitlite / path("blobs") / path(ref);
     path dst = filesystem::current_path() / path(filename);
     if (!filesystem::is_regular_file(src)) {
         return false;

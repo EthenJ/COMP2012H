@@ -17,7 +17,7 @@ const path Tester::SRC = filesystem::current_path() / path("src");
 const regex Tester::DEF_PATTERN(R"#(^D\s*([a-zA-Z_][a-zA-Z_0-9]*)\s*"(.*)"\s*$)#");
 const regex Tester::ADD_PATTERN(R"(\+\s*(\S+)\s+(\S+))");
 const regex Tester::RM_PATTERN(R"(-\s*(\S+))");
-const regex Tester::VAR_PATTERN(R"((\$\{.*?}))");
+const regex Tester::VAR_PATTERN(R"((\$\{.*?\}))");
 const regex Tester::CMD_PATTERN(R"(>\s*(.*))");
 const regex Tester::END_PATTERN(R"(<<<)");
 const regex Tester::EXIST_PATTERN(R"(E\s*(\S+))");
@@ -190,7 +190,7 @@ std::string Tester::substitute_once(const std::string &raw) {
                 continue;
             }
         }
-        regex pattern(R"(\$\{)" + varname + R"(})");
+        regex pattern(R"(\$\{)" + varname + R"(\})");
         substituted = regex_replace(substituted, pattern, iter->second);
     }
     return substituted;
