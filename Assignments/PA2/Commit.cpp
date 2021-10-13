@@ -211,9 +211,9 @@ void commit_print(const Commit *commit)
 
 Commit *get_lca(Commit *c1, Commit *c2)
 {
-    for (Commit *m = c1; m->parent != nullptr; m = m->parent)
+    for (Commit *m = c1; m != nullptr; m = m->parent)
     {
-        for (Commit *this_commit = c1; this_commit->parent != nullptr; this_commit = this_commit->parent)
+        for (Commit *this_commit = c2; this_commit != nullptr; this_commit = this_commit->parent)
         {
             if (this_commit == m)
             {

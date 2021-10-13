@@ -116,17 +116,22 @@ bool commit(const string &message, Blob *current_branch, List *staged_files, Lis
     // 1. Failure check: If there are no files in the staging area, and no files staged for removal,
     if ((staged_files->head->next == staged_files->head)) // no files in the staging area
     {
+        bool staged_for_removal = false;
         for (Blob *this_file = head_commit->tracked_files->head->next;
              this_file != head_commit->tracked_files->head; this_file = this_file->next)
         {
             if (list_find_name(tracked_files, this_file->name) == nullptr) // staged for removal,
             {
+                staged_for_removal = true;
                 break;
             }
         }
-        // print No changes added to the commit. and return false.
-        cout << msg_no_changes_added << endl;
-        return false;
+        if (staged_for_removal == false)
+        {
+            // print No changes added to the commit. and return false.
+            cout << msg_no_changes_added << endl;
+            return false;
+        }
     }
 
     // 2. Create a new commit. Save the message, time and commit id.
@@ -151,6 +156,7 @@ bool commit(const string &message, Blob *current_branch, List *staged_files, Lis
 
 bool remove(const string &filename, List *staged_files, List *tracked_files, const Commit *head_commit)
 {
+    bool remove = false;
     // 1. If the file is tracked by the head commit of the repository, then remove it from the currently tracked files of the repository
     if (list_find_name(head_commit->tracked_files, filename) != nullptr) // If the file is tracked by the head commit of the repository
     {
@@ -160,20 +166,23 @@ bool remove(const string &filename, List *staged_files, List *tracked_files, con
             restricted_delete(filename); // and remove the file from the current working directory (if it exists).
         }
         // The file is staged for removal.
-        return true;
+        remove = true;
     }
 
     // 2. If the file was staged for addition, remove it from the tracked files of the repository and the staging area.
-    else if (list_find_name(tracked_files, filename)) // not in head_commit->tracked_files, but in tracked_files
+    if (list_find_name(tracked_files, filename) != nullptr) // not in head_commit->tracked_files, but in tracked_files
     {
         list_remove(tracked_files, filename); // remove it from the tracked files of the repository
         list_remove(staged_files, filename);  // remove it from the tracked files of the staging area
-        return true;
+        remove = true;
     }
 
     // 3. If none of the above is satisfied, print No reason to remove the file. and return false. Otherwise, return true.
-    cout << msg_no_reason_remove << endl;
-    return false;
+    if (!remove)
+    {
+        cout << msg_no_reason_remove << endl;
+    }
+    return remove;
 }
 
 void log(const Commit *head_commit)
@@ -217,13 +226,13 @@ void status(const Blob *current_branch, const List *branches, const List *staged
     for (Blob *this_staged_file = staged_files->head->next;
          this_staged_file != staged_files->head; this_staged_file = this_staged_file->next)
     {
-        if (is_file_exist(this_staged_file->name))
-        {
-            if (this_staged_file->ref == get_sha1(this_staged_file->name))
-            {
-                cout << this_staged_file->name << endl;
-            }
-        }
+        // if (is_file_exist(this_staged_file->name))
+        // {
+        //     if (this_staged_file->ref == get_sha1(this_staged_file->name))
+        //     {
+        cout << this_staged_file->name << endl;
+        //     }
+        // }
     }
     cout << endl;
 
@@ -325,7 +334,6 @@ void status(const Blob *current_branch, const List *branches, const List *staged
             cout << cwd_file->name << endl;
         }
     }
-    cout << endl;
 
     // Entries should be listed in ascending lexicographic order. The * of current branch does not count.
 }
@@ -487,6 +495,7 @@ bool reset(Commit *commit, Blob *current_branch, List *staged_files, List *track
     list_clear(staged_files);                           // Clear the staging area
 
     // 5. The given commit becomes the head commit of the current branch. Also update the head commit of the repository.
+    current_branch->commit = commit;
     head_commit = commit;
 
     // 6. Return true.
@@ -534,11 +543,24 @@ bool remove_branch(const string &branch_name, Blob *current_branch, List *branch
 bool merge(const string &branch_name, Blob *&current_branch, List *branches, List *staged_files, List *tracked_files,
            const List *cwd_files, Commit *&head_commit)
 {
-
     // 1. Failure check:
     //      If the given branch does not exist, print A branch with that name does not exist., and return false.
+    if (list_find_name(branches, branch_name) == nullptr) // If the given branch does not exist
+    {
+        cout << msg_branch_does_not_exist << endl; // print A branch with that name does not exist
+        return false;                              // return false
+    }
     //      If trying to merge the current branch, print Cannot merge a branch with itself. and return false.
+    else if (branch_name == current_branch->name) // If trying to merge the current branch
+    {
+        cout << msg_merge_current << endl; // print Cannot merge a branch with itself
+        return false;                      // return false
+    }
     //      If there exists uncommitted changes, print You have uncommitted changes. and return false.
+    // else if ()
+    // {
+    // }
+
     // 2. Otherwise, proceed to compute the split point of the current branch and the given branch.
     //  The split point is a latest common ancestor of the head commit of the current branch and the head commit of the given branch:
     /*initial commit --- c1 --- c2 --- c3 --- c4 (head of master)
