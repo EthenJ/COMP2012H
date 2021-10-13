@@ -557,9 +557,11 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
         return false;                      // return false
     }
     //      If there exists uncommitted changes, print You have uncommitted changes. and return false.
-    // else if ()
-    // {
-    // }
+    else if()
+
+
+
+
 
     // 2. Otherwise, proceed to compute the split point of the current branch and the given branch.
     //  The split point is a latest common ancestor of the head commit of the current branch and the head commit of the given branch:
