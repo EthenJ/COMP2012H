@@ -456,11 +456,10 @@ bool reset(Commit *commit, Blob *current_branch, List *staged_files, List *track
     for (Blob *cwd_file = cwd_files->head->next; cwd_file != cwd_files->head; cwd_file = cwd_file->next)
     {
         string ref = get_sha1(cwd_file->name);
-        Blob *committed_file = list_find_name(current_branch->commit->tracked_files, cwd_file->name);
-        if ((committed_file == nullptr) || committed_file->ref != ref) // untracked file
+        if (list_find_name(tracked_files, cwd_file->name) == nullptr) // untracked file
         {
-            Blob *target_file = list_find_name(commit->tracked_files, committed_file->name);
-            if (target_file != nullptr && target_file->ref != ref)
+            Blob *target_file = list_find_name(commit->tracked_files, cwd_file->name);
+            if ((target_file != nullptr) && (target_file->ref != ref))
             {
                 cout << msg_untracked_file << endl;
                 return false;
