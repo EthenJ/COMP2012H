@@ -188,7 +188,7 @@ void list_replace(List *list, const List *another) //Replace the linked list wit
 List *list_copy(const List *list)
 {
     List *copied_list = list_new();
-    list_replace(copied_list,list);
+    list_replace(copied_list, list);
     return copied_list;
 }
 
@@ -211,5 +211,15 @@ void commit_print(const Commit *commit)
 
 Commit *get_lca(Commit *c1, Commit *c2)
 {
+    for (Commit *m = c1; m->parent != nullptr; m = m->parent)
+    {
+        for (Commit *this_commit = c1; this_commit->parent != nullptr; this_commit = this_commit->parent)
+        {
+            if (this_commit == m)
+            {
+                return this_commit;
+            }
+        }
+    }
     return nullptr;
 }

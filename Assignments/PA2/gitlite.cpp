@@ -463,26 +463,87 @@ bool reset(Commit *commit, Blob *current_branch, List *staged_files, List *track
 
     // 2. Take all files in the given commit and write the content of them to the current working directory.
     //      Overwrite any existing files.
+    for (Blob *reset_file = commit->tracked_files->head->next;
+         reset_file != commit->tracked_files->head; reset_file = reset_file->next)
+    {
+        write_file(reset_file->name, reset_file->ref);
+    }
+
     // 3. Any files that are tracked in the head commit of the repository but not by the given commit are deleted.
+    for (Blob *delete_file = head_commit->tracked_files->head->next;
+         delete_file != head_commit->tracked_files->head; delete_file = delete_file->next)
+    // files that are tracked in the head commit of the repository
+    {
+        if (list_find_name(commit->tracked_files, delete_file->name) == nullptr)
+        // but not by the given commit
+        {
+            restricted_delete(delete_file->name);
+        }
+    }
+
     // 4. Updated October 8: Set the currently tracked files of the repository to
-    //      those that are tracked by the head commit of the given branch given commit. Clear the staging area as well.
+    //      those that are tracked by the given commit. Clear the staging area as well.
+    list_replace(tracked_files, commit->tracked_files); // Set the currently tracked files of the repository to those that are tracked by the given commit
+    list_clear(staged_files);                           // Clear the staging area
+
     // 5. The given commit becomes the head commit of the current branch. Also update the head commit of the repository.
+    head_commit = commit;
+
     // 6. Return true.
-    return false;
+    return true;
 }
 
 Blob *branch(const string &branch_name, List *branches, Commit *head_commit)
 {
-    return nullptr;
+    // Failure check: If a branch with the given name already exists,
+    if (list_find_name(branches, branch_name) != nullptr)
+    {
+        //      print A branch with that name already exists. and return nullptr.
+        cout << msg_branch_does_not_exist << endl;
+        return nullptr;
+    }
+
+    // The head commit of the repository becomes the head commit of the new branch.
+    Blob *new_branch = list_put(branches, branch_name, head_commit);
+
+    // Return a pointer to the new branch.
+    return new_branch;
 }
 
 bool remove_branch(const string &branch_name, Blob *current_branch, List *branches)
 {
-    return false;
+    // 1. Failure check:
+    //      If the given branch does not exist, print A branch with that name does not exist. and return false.
+    if (list_find_name(branches, branch_name) == nullptr)
+    {
+        cout << msg_branch_does_not_exist << endl;
+        return false;
+    }
+    //      If trying to remove the current branch, print Cannot remove the current branch. and return false.
+    else if (branch_name == current_branch->name)
+    {
+        cout << msg_remove_current << endl;
+        return false;
+    }
+
+    // 2. Delete the branch from the repository. Do not delete any commits.
+    list_remove(branches, branch_name);
+    return true;
 }
 
 bool merge(const string &branch_name, Blob *&current_branch, List *branches, List *staged_files, List *tracked_files,
            const List *cwd_files, Commit *&head_commit)
 {
+
+    // 1. Failure check:
+    //      If the given branch does not exist, print A branch with that name does not exist., and return false.
+    //      If trying to merge the current branch, print Cannot merge a branch with itself. and return false.
+    //      If there exists uncommitted changes, print You have uncommitted changes. and return false.
+    // 2. Otherwise, proceed to compute the split point of the current branch and the given branch.
+    //  The split point is a latest common ancestor of the head commit of the current branch and the head commit of the given branch:
+    /*initial commit --- c1 --- c2 --- c3 --- c4 (head of master)
+     *                           \
+     *                             --- n1 --- n2 (head of new)*/
+
     return false;
 }
