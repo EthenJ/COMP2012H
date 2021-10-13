@@ -116,25 +116,17 @@ bool commit(const string &message, Blob *current_branch, List *staged_files, Lis
     // 1. Failure check: If there are no files in the staging area, and no files staged for removal,
     if ((staged_files->head->next == staged_files->head)) // no files in the staging area
     {
-        if (head_commit->tracked_files->head->next != nullptr)
+        for (Blob *this_file = head_commit->tracked_files->head->next;
+             this_file != head_commit->tracked_files->head; this_file = this_file->next)
         {
-            bool staged_for_removal = false;
-            for (Blob *this_file = head_commit->tracked_files->head->next;
-                 this_file != head_commit->tracked_files->head; this_file = this_file->next)
+            if (list_find_name(tracked_files, this_file->name) == nullptr) // staged for removal,
             {
-                if (list_find_name(tracked_files, this_file->name) == nullptr) // staged for removal,
-                {
-                    staged_for_removal = true;
-                    break;
-                }
-            }
-            if (!(staged_for_removal))
-            {
-                // print No changes added to the commit. and return false.
-                cout << msg_no_changes_added << endl;
-                return false;
+                break;
             }
         }
+        // print No changes added to the commit. and return false.
+        cout << msg_no_changes_added << endl;
+        return false;
     }
 
     // 2. Create a new commit. Save the message, time and commit id.
@@ -252,6 +244,7 @@ void status(const Blob *current_branch, const List *branches, const List *staged
     cout << status_modifications_not_staged_header << endl;
 
     // Append (modified) for case 1 and 2. Append (deleted) for case 3 and 4.
+    List *not_staged = list_new();
 
     // 1. Unstaged files that are tracked in the head commit of the repository,
     // but the content recorded in the commit is different with the content in the current working directory (CWD).
@@ -266,7 +259,7 @@ void status(const Blob *current_branch, const List *branches, const List *staged
             {
                 if (this_committed_file->ref != get_sha1(this_committed_file->name))
                 {
-                    cout << this_committed_file->name << msg_status_modified << endl;
+                    list_put(not_staged, this_committed_file->name, msg_status_modified);
                 }
             }
         }
@@ -280,7 +273,7 @@ void status(const Blob *current_branch, const List *branches, const List *staged
         {
             if (this_staged_file->ref != get_sha1(this_staged_file->name))
             {
-                cout << this_staged_file->name << msg_status_modified << endl;
+                list_put(not_staged, this_staged_file->name, msg_status_modified);
             }
         }
     }
@@ -291,7 +284,7 @@ void status(const Blob *current_branch, const List *branches, const List *staged
     {
         if (!(is_file_exist(this_staged_file->name)))
         {
-            cout << this_staged_file->name << msg_status_deleted << endl;
+            list_put(not_staged, this_staged_file->name, msg_status_deleted);
         }
     }
 
@@ -306,10 +299,20 @@ void status(const Blob *current_branch, const List *branches, const List *staged
             // but the content recorded in the commit is different with the content in the current working directory (CWD).
             if (!(is_file_exist(this_committed_file->name)))
             {
-                cout << this_committed_file->name << msg_status_deleted << endl;
+                list_put(not_staged, this_committed_file->name, msg_status_deleted);
             }
         }
     }
+
+    // print these files in the correct order
+
+    for (Blob *this_not_staged_file = not_staged->head->next;
+         this_not_staged_file != not_staged->head; this_not_staged_file = this_not_staged_file->next)
+    {
+        cout << this_not_staged_file->name << this_not_staged_file->ref << endl;
+    }
+
+    list_delete(not_staged); // release memory
 
     cout << endl;
 
@@ -359,6 +362,156 @@ bool checkout(const string &branch_name, Blob *&current_branch, const List *bran
               List *tracked_files, const List *cwd_files, Commit *&head_commit)
 
 {
+    Blob *target_branch = list_find_name(branches, branch_name);
+    // 1. Failure check:
+
+    //      If the given branch does not exist, print A branch with that name does not exist. and return false.
+    if (target_branch == nullptr)
+    {
+        cout << msg_branch_does_not_exist << endl;
+        return false;
+    }
+
+    //      If the given branch is the current branch, print No need to checkout the current branch. and return false.
+    else if (branch_name == current_branch->name)
+    {
+        cout << msg_checkout_current << endl;
+        return false;
+    }
+
+    //      If there exists untracked files in the current working directory that would be overwritten
+    for (Blob *this_file = target_branch->commit->tracked_files->head->next;
+         this_file != target_branch->commit->tracked_files->head; this_file = this_file->next)
+    {
+        Blob *cwd_file = list_find_name(cwd_files, this_file->name);
+        if (this_file->ref != cwd_file->ref) // file to be overwritten
+        {
+            if (cwd_file->ref != list_find_name(head_commit->tracked_files, this_file->name)->ref) // different with the comitted one
+            {
+                //      (see below for the files that would be overwritten), print There is an untracked file in the way;
+                //      delete it, or add and commit it first. and return false.
+                cout << msg_untracked_file << endl;
+                return false;
+            }
+        }
+    }
+
+    // 2. Take all files in the head commit of the branch and write the content of them to the current working directory.
+    // Overwrite any existing files.
+    for (Blob *this_file = target_branch->commit->tracked_files->head->next;
+         this_file != target_branch->commit->tracked_files->head; this_file = this_file->next)
+    {
+        write_file(this_file->name, this_file->ref);
+    }
+
+    // 3. Any files that are tracked in the head commit of the repository but not the head commit of the given branch are deleted.
+    for (Blob *this_file = head_commit->tracked_files->head->next;
+         this_file != head_commit->tracked_files->head; this_file = this_file->next)
+    // Any files that are tracked in the head commit of the repository
+    {
+        if (list_find_name(target_branch->commit->tracked_files, this_file->name) == nullptr)
+        // but not the head commit of the given branch
+        {
+            restricted_delete(this_file->name); // delete
+        }
+    }
+
+    // 4. Set the currently tracked files of the repository to those that are tracked by the head commit of the given branch.
+    // Clear the staging area as well.
+    // Set the currently tracked files of the repository to those that are tracked by the head commit of the given branch
+    list_replace(tracked_files, target_branch->commit->tracked_files);
+
+    list_clear(staged_files); // Clear the staging area as well.
+
+    // 5. The given branch becomes the current branch. Also update the head commit of the repository.
+    current_branch = target_branch;      // The given branch becomes the current branch
+    head_commit = target_branch->commit; // update the head commit of the repository
+
+    // 6. Return true.
+    return true;
+}
+
+bool reset(Commit *commit, Blob *current_branch, List *staged_files, List *tracked_files, const List *cwd_files,
+           Commit *&head_commit)
+{
+    // 1. Failure check:
+    //      If commit is nullptr, then the wrapper cannot find the commit with the commit id.
+    //          Print No commit with that id exists. and return false.
+    if (commit == nullptr) // If commit is nullptr
+    {
+        cout << msg_commit_does_not_exist << endl; // Print No commit with that id exists.
+        return false;                              // return false
+    }
+
+    //      If there exists untracked files in the current working directory that would be overwritten (see below for the files that would be overwritten),
+    //          print There is an untracked file in the way; delete it, or add and commit it first. and return false.
+    for (Blob *this_file = commit->tracked_files->head->next;
+         this_file != commit->tracked_files->head; this_file = this_file->next)
+    {
+        Blob *cwd_file = list_find_name(cwd_files, this_file->name);
+        if (this_file->ref != cwd_file->ref) // file to be overwritten
+        {
+            if (cwd_file->ref != list_find_name(head_commit->tracked_files, this_file->name)->ref) // different with the comitted one
+            {
+                //      (see below for the files that would be overwritten), print There is an untracked file in the way;
+                //      delete it, or add and commit it first. and return false.
+                cout << msg_untracked_file << endl;
+                return false;
+            }
+        }
+    }
+
+    // 2. Take all files in the given commit and write the content of them to the current working directory.
+    //      Overwrite any existing files.
+    for (Blob *reset_file = commit->tracked_files->head->next;
+         reset_file != commit->tracked_files->head; reset_file = reset_file->next)
+    {
+        write_file(reset_file->name, reset_file->ref);
+    }
+
+    // 3. Any files that are tracked in the head commit of the repository but not by the given commit are deleted.
+    for (Blob *delete_file = head_commit->tracked_files->head->next;
+         delete_file != head_commit->tracked_files->head; delete_file = delete_file->next)
+    // files that are tracked in the head commit of the repository
+    {
+        if (list_find_name(commit->tracked_files, delete_file->name) == nullptr)
+        // but not by the given commit
+        {
+            restricted_delete(delete_file->name);
+        }
+    }
+
+    // 4. Updated October 8: Set the currently tracked files of the repository to
+    //      those that are tracked by the given commit. Clear the staging area as well.
+    list_replace(tracked_files, commit->tracked_files); // Set the currently tracked files of the repository to those that are tracked by the given commit
+    list_clear(staged_files);                           // Clear the staging area
+
+    // 5. The given commit becomes the head commit of the current branch. Also update the head commit of the repository.
+    head_commit = commit;
+
+    // 6. Return true.
+    return true;
+}
+
+Blob *branch(const string &branch_name, List *branches, Commit *head_commit)
+{
+    // Failure check: If a branch with the given name already exists,
+    if (list_find_name(branches, branch_name) != nullptr)
+    {
+        //      print A branch with that name already exists. and return nullptr.
+        cout << msg_branch_does_not_exist << endl;
+        return nullptr;
+    }
+
+    // The head commit of the repository becomes the head commit of the new branch.
+    Blob *new_branch = list_put(branches, branch_name, head_commit);
+
+    // Return a pointer to the new branch.
+    return new_branch;
+}
+
+bool remove_branch(const string &branch_name, Blob *current_branch, List *branches)
+{
     // 1. Failure check:
     //      If the given branch does not exist, print A branch with that name does not exist. and return false.
     if (list_find_name(branches, branch_name) == nullptr)
@@ -366,34 +519,31 @@ bool checkout(const string &branch_name, Blob *&current_branch, const List *bran
         cout << msg_branch_does_not_exist << endl;
         return false;
     }
-    //      If the given branch is the current branch, print No need to checkout the current branch. and return false.
-    //      If there exists untracked files in the current working directory that would be overwritten (see below for the files that would be overwritten), print There is an untracked file in the way; delete it, or add and commit it first. and return false.
-    // 2. Take all files in the head commit of the branch and write the content of them to the current working directory. Overwrite any existing files.
-    // 3. Any files that are tracked in the head commit of the repository but not the head commit of the given branch are deleted.
-    // 4. Set the currently tracked files of the repository to those that are tracked by the head commit of the given branch. Clear the staging area as well.
-    // 5. The given branch becomes the current branch. Also update the head commit of the repository.
-    // 6. Return true.
-    return false;
-}
+    //      If trying to remove the current branch, print Cannot remove the current branch. and return false.
+    else if (branch_name == current_branch->name)
+    {
+        cout << msg_remove_current << endl;
+        return false;
+    }
 
-bool reset(Commit *commit, Blob *current_branch, List *staged_files, List *tracked_files, const List *cwd_files,
-           Commit *&head_commit)
-{
-    return false;
-}
-
-Blob *branch(const string &branch_name, List *branches, Commit *head_commit)
-{
-    return nullptr;
-}
-
-bool remove_branch(const string &branch_name, Blob *current_branch, List *branches)
-{
-    return false;
+    // 2. Delete the branch from the repository. Do not delete any commits.
+    list_remove(branches, branch_name);
+    return true;
 }
 
 bool merge(const string &branch_name, Blob *&current_branch, List *branches, List *staged_files, List *tracked_files,
            const List *cwd_files, Commit *&head_commit)
 {
+
+    // 1. Failure check:
+    //      If the given branch does not exist, print A branch with that name does not exist., and return false.
+    //      If trying to merge the current branch, print Cannot merge a branch with itself. and return false.
+    //      If there exists uncommitted changes, print You have uncommitted changes. and return false.
+    // 2. Otherwise, proceed to compute the split point of the current branch and the given branch.
+    //  The split point is a latest common ancestor of the head commit of the current branch and the head commit of the given branch:
+    /*initial commit --- c1 --- c2 --- c3 --- c4 (head of master)
+     *                           \
+     *                             --- n1 --- n2 (head of new)*/
+
     return false;
 }
