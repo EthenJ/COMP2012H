@@ -105,7 +105,7 @@ bool add(const string &filename, List *staged_files, List *tracked_files, const 
 
         // In most cases, simply save the content of the file to the staging area as well. Return true.
         list_put(staged_files, filename, ref);
-        stage_content(filename); // stupid!!!
+        // stage_content(filename); // stupid!!!
         return true;
     }
     return false;
@@ -549,13 +549,16 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
         return false;                              // return false
     }
     //      If trying to merge the current branch, print Cannot merge a branch with itself. and return false.
-    else if (branch_name == current_branch->name) // If trying to merge the current branch
+    if (branch_name == current_branch->name) // If trying to merge the current branch
     {
         cout << msg_merge_current << endl; // print Cannot merge a branch with itself
         return false;                      // return false
     }
     //      If there exists uncommitted changes, print You have uncommitted changes. and return false.
-    // else if()
+
+
+
+
 
     // 2. Otherwise, proceed to compute the split point of the current branch and the given branch.
     //  The split point is a latest common ancestor of the head commit of the current branch and the head commit of the given branch:
