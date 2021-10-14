@@ -555,16 +555,32 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
         return false;                      // return false
     }
     //      If there exists uncommitted changes, print You have uncommitted changes. and return false.
-
-
-
-
+    bool uncommitted_changes = false;
+    if (staged_files->head->next == staged_files->head)
+    {
+        uncommitted_changes = true;
+    }
+    for (Blob *this_committed_file = head_commit->tracked_files->head->next;
+         this_committed_file != head_commit->tracked_files->head; this_committed_file = this_committed_file->next)
+    {
+        if (list_find_name(tracked_files, this_committed_file->name) == nullptr)
+        {
+            uncommitted_changes = true;
+        }
+    }
+    if (uncommitted_changes)
+    {
+        cout << msg_exists_uncommitted_changes << endl;
+        return false;
+    }
 
     // 2. Otherwise, proceed to compute the split point of the current branch and the given branch.
     //  The split point is a latest common ancestor of the head commit of the current branch and the head commit of the given branch:
     /*initial commit --- c1 --- c2 --- c3 --- c4 (head of master)
      *                           \
      *                             --- n1 --- n2 (head of new)*/
+
+    
 
     return false;
 }
