@@ -541,9 +541,10 @@ bool remove_branch(const string &branch_name, Blob *current_branch, List *branch
 bool merge(const string &branch_name, Blob *&current_branch, List *branches, List *staged_files, List *tracked_files,
            const List *cwd_files, Commit *&head_commit)
 {
+    Blob *given_branch = list_find_name(branches, branch_name);
     // 1. Failure check:
     //      If the given branch does not exist, print A branch with that name does not exist., and return false.
-    if (list_find_name(branches, branch_name) == nullptr) // If the given branch does not exist
+    if (given_branch == nullptr) // If the given branch does not exist
     {
         cout << msg_branch_does_not_exist << endl; // print A branch with that name does not exist
         return false;                              // return false
@@ -556,7 +557,8 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
     }
     //      If there exists uncommitted changes, print You have uncommitted changes. and return false.
     bool uncommitted_changes = false;
-    if (staged_files->head->next == staged_files->head)
+    if (staged_files->head->next != staged_files->head) // exist files in staged area
+    // staged for addition
     {
         uncommitted_changes = true;
     }
@@ -564,6 +566,7 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
          this_committed_file != head_commit->tracked_files->head; this_committed_file = this_committed_file->next)
     {
         if (list_find_name(tracked_files, this_committed_file->name) == nullptr)
+        // staged for removal
         {
             uncommitted_changes = true;
         }
@@ -574,13 +577,118 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
         return false;
     }
 
-    // 2. Otherwise, proceed to compute the split point of the current branch and the given branch.
-    //  The split point is a latest common ancestor of the head commit of the current branch and the head commit of the given branch:
+    /* 2. Otherwise, proceed to compute the split point of the current branch and the given branch.
+     *  The split point is a latest common ancestor of the head commit of the current branch and the head commit of the given branch:
     /*initial commit --- c1 --- c2 --- c3 --- c4 (head of master)
      *                           \
      *                             --- n1 --- n2 (head of new)*/
+    Commit *split_point = get_lca(current_branch->commit, given_branch->commit);
 
-    
+    /* 3. If the split point is the head commit of the given branch, then all changes in the given branch exist in the current branch
+     *      (the current branch is ahead of the given branch). So there is nothing to be done in the current branch.
+     *      Simply print Given branch is an ancestor of the current branch. and return true.*/
+    if (split_point == given_branch->commit) // If the split point is the head commit of the given branch
+    {
+        cout << msg_given_is_ancestor_of_current << endl; // Simply print Given branch is an ancestor of the current branch.
+        return true;                                      // and return true.
+    }
+
+    /* 4. If the split point is the head commit of the current branch, then all changes in the current branch exist in the given branch
+     *      (the given branch is ahead of the current branch). Simply set the state of the repository to the head commit of the given branch (using one command above).
+     *      If it succeeded, print Current branch fast-forwarded. and return true. If it failed, return false.*/
+    if (split_point == current_branch->commit) // If the split point is the head commit of the current branch
+    {
+        bool merge_succeeded = false;
+        merge_succeeded = reset(given_branch->commit, current_branch, staged_files, tracked_files, cwd_files, head_commit);
+        if (merge_succeeded)
+        {
+            cout << msg_fast_forward << endl;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /* 5. Otherwise, the split point is neither the head commit of the current branch and the head commit of the given branch.
+     *      Their history has diverged, like the above example. We need to incorporate the latest changes from both branches.*/
+
+    /* 6. Failure check: Traverse cwd_files,if there exists a file that is not tracked in the head commit of the current branch
+     *      but tracked in the head commit of the given branch, print There is an untracked file in the way; delete it, or add and commit it first. and return false.*/
+    for (Blob *cwd_file = cwd_files->head->next; cwd_file != cwd_files->head; cwd_file = cwd_file->next) // Traverse cwd_files
+    {
+        if ((list_find_name(current_branch->commit->tracked_files, cwd_file->name) == nullptr) && // not tracked in the head commit of the current branch
+            (list_find_name(given_branch->commit->tracked_files, cwd_file->name) != nullptr))     // but tracked in the head commit of the given branch
+        {
+            cout << msg_untracked_file << endl; // print There is an untracked file in the way; delete it, or add and commit it first
+            return false;                       // return false
+        }
+    }
+
+    /* 7. Otherwise, proceed to merge the two branches with rules below. A general idea is to incorporate the latest changes from both branches.*/
+
+    List *conflict_files = list_new();
+    for (Blob *lca_file = split_point->tracked_files->head->next; lca_file != split_point->tracked_files->head; lca_file = lca_file->next)
+    {
+        Blob *given_file = list_find_name(given_branch->commit->tracked_files, lca_file->name);
+        Blob *current_file = list_find_name(current_branch->commit->tracked_files, lca_file->name);
+
+        /*      1. Any files that have been modified in the given branch but not modified in the current branch
+         *         since the split point should be changed to their versions in the given branch.
+         *          · Checkout the files and stage the files for addition.
+         *          · In addition, you need to call stage_content(filename) explicitly to modify the index in the .gitlite directory.*/
+        if ((given_file != nullptr) && (current_file != nullptr))
+        {
+            if ((lca_file->ref != given_file->ref) && // have been modified in the given branch
+                (lca_file->ref == current_file->ref)) // but not modified in the current branch
+            {
+                checkout(lca_file->name, given_branch->commit);                // Checkout the file
+                add(lca_file->name, staged_files, tracked_files, head_commit); // stage the file for addition
+                stage_content(lca_file->name);                                 // modify the index in the .gitlite directory
+            }
+
+            /*      2. Any files that have been modified in the current branch but not modified in the given branch since the split point should remain unchanged.*/
+            else if ((lca_file->ref != current_file->ref) && // have been modified in the current branch
+                     (lca_file->ref == given_file->ref))     // but not modified in the given branch
+            {
+                /*remain unchanged*/
+            }
+
+            /*      3. Any files that have been modified in both the current branch and the given branch in the same way
+             *         (both modified with same content or both removed), should remain unchanged.*/
+            else if ((lca_file->ref != current_file->ref) && // have been modified in the current branch
+                     (lca_file->ref != given_file->ref))     // have been modified in the given branch
+            {
+                if (current_file->ref == given_file->ref) // both modified with same content
+                {
+                    /*remain unchanged*/
+                }
+                else
+                {
+                    list_put(conflict_files, lca_file->name, lca_file->ref);
+                }
+            }
+        }
+        else if ((given_file == nullptr) && (current_file == nullptr)) // both removed
+        {
+            /*remain unchanged*/
+        }
+    }
+
+    /*      4. Any files that were not present at the split point and are present only in the current branch should remained unchanged.*/
+    /*      5. Any files that were not present at the split point and are present only in the given branch should be added with their versions in the given branch.
+     *          · Checkout the files and stage the files for addition.
+     *          · In addition, you need to call stage_content(filename) explicitly to modify the index in the .gitlite directory.*/
+
+    // Any files present at the split point, unmodified in the current branch, and absent in the given branch should be staged for removal.
+    // Any files present at the split point, unmodified in the given branch, and absent in the current branch should remain absent.
+    // Any files modified in different ways in the current branch and the given branch are in conflict.
+    // A file is modified in different ways if:
+    // It is changed in both branches with different content.
+    // It is changed in one branch but deleted in another branch.
+    // It was absent at the split point but present in both branches with different content.
+    // Replace the content of these files in the current working directory by the conflict resolution marker: (See add_conflict_marker(filename, ref) in Utils.cpp)
 
     return false;
 }
