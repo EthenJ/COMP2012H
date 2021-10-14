@@ -541,6 +541,7 @@ bool remove_branch(const string &branch_name, Blob *current_branch, List *branch
 bool merge(const string &branch_name, Blob *&current_branch, List *branches, List *staged_files, List *tracked_files,
            const List *cwd_files, Commit *&head_commit)
 {
+    cerr << 1 << endl;
     Blob *given_branch = list_find_name(branches, branch_name);
     // 1. Failure check:
     //      If the given branch does not exist, print A branch with that name does not exist., and return false.
@@ -576,10 +577,11 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
         cout << msg_exists_uncommitted_changes << endl;
         return false;
     }
+    cerr << 2 << endl;
 
     /* 2. Otherwise, proceed to compute the split point of the current branch and the given branch.
      *  The split point is a latest common ancestor of the head commit of the current branch and the head commit of the given branch:
-    /*initial commit --- c1 --- c2 --- c3 --- c4 (head of master)
+     *initial commit --- c1 --- c2 --- c3 --- c4 (head of master)
      *                           \
      *                             --- n1 --- n2 (head of new)*/
     Commit *split_point = get_lca(current_branch->commit, given_branch->commit);
@@ -592,7 +594,7 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
         cout << msg_given_is_ancestor_of_current << endl; // Simply print Given branch is an ancestor of the current branch.
         return true;                                      // and return true.
     }
-
+    cerr << 3 << endl;
     /* 4. If the split point is the head commit of the current branch, then all changes in the current branch exist in the given branch
      *      (the given branch is ahead of the current branch). Simply set the state of the repository to the head commit of the given branch (using one command above).
      *      If it succeeded, print Current branch fast-forwarded. and return true. If it failed, return false.*/
@@ -610,7 +612,7 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
             return false;
         }
     }
-
+    cerr << 4 << endl;
     /* 5. Otherwise, the split point is neither the head commit of the current branch and the head commit of the given branch.
      *      Their history has diverged, like the above example. We need to incorporate the latest changes from both branches.*/
 
@@ -625,7 +627,7 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
             return false;                       // return false
         }
     }
-
+    cerr << 5 << endl;
     /* 7. Otherwise, proceed to merge the two branches with rules below. A general idea is to incorporate the latest changes from both branches.*/
 
     List *conflict_files = list_new();
@@ -668,7 +670,7 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
                 {
                     /* in conflict
                      * It is changed in both branches with different content.*/
-                    list_put(conflict_files, lca_file->name, "");
+                    list_put(conflict_files, lca_file->name, given_file->ref);
                 }
             }
         }
@@ -679,15 +681,28 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
         else if ((given_file != nullptr) && (current_file == nullptr) && // It is changed in one branch but deleted in another branch
                  (given_file->ref != lca_file->ref))
         {
-            list_put(conflict_files, lca_file->name, "");
+            list_put(conflict_files, lca_file->name, given_file->ref);
         }
         else if ((current_file != nullptr) && (given_file == nullptr) && // It is changed in one branch but deleted in another branch
                  (current_file->ref != lca_file->ref))
         {
-            list_put(conflict_files, lca_file->name, "");
+            list_put(conflict_files, lca_file->name, string());
+        }
+
+        // 6. Any files present at the split point, unmodified in the current branch, and absent in the given branch should be staged for removal.
+        else if ((current_file != nullptr) && (given_file == nullptr) && // absent in the given branch
+                 (current_file->ref == lca_file->ref))                   // present at the split point, unmodified in the current branch
+        {
+            remove(current_file->name, staged_files, tracked_files, head_commit); // staged for removal
+        }
+        // 7. Any files present at the split point, unmodified in the given branch, and absent in the current branch should remain absent
+        else if ((current_file == nullptr) && (given_file != nullptr) && // absent in the current branch
+                 (given_file->ref == lca_file->ref))                     // unmodified in the given branch
+        {
+            /*remain absent*/
         }
     }
-
+    cerr << 6 << endl;
     /*      4. Any files that were not present at the split point and are present only in the current branch should remained unchanged.*/
     for (Blob *current_file = current_branch->commit->tracked_files->head->next;
          current_file != current_branch->commit->tracked_files->head; current_file = current_file->next)
@@ -695,7 +710,6 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
         Blob *lca_file = list_find_name(split_point->tracked_files, current_file->name);
         Blob *given_file = list_find_name(given_branch->commit->tracked_files, current_file->name);
         if (lca_file == nullptr) // not present at the split point
-
         {
             if ((given_file == nullptr) && (current_file != nullptr)) // present only in the current branch
             {
@@ -705,16 +719,44 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
             {
                 if (given_file->ref != current_file->ref) // It was absent at the split point but present in both branches with different content.
                 {
-                    list_put(conflict_files, given_file->name, "");
+                    list_put(conflict_files, given_file->name, given_file->ref);
                 }
             }
         }
     }
-
+    cerr << 7 << endl;
     /*      5. Any files that were not present at the split point and are present only in the given branch should be added with their versions in the given branch.
      *          · Checkout the files and stage the files for addition.
      *          · In addition, you need to call stage_content(filename) explicitly to modify the index in the .gitlite directory.*/
-
+    for (Blob *given_file = given_branch->commit->tracked_files->head->next;
+         given_file != given_branch->commit->tracked_files->head; given_file = given_file->next)
+    {
+        cerr << 11 << endl;
+        Blob *lca_file = list_find_name(split_point->tracked_files, given_file->name);
+        cerr << 12 << endl;
+        Blob *current_file = list_find_name(current_branch->commit->tracked_files, given_file->name);
+        cerr << 13 << endl;
+        if (lca_file == nullptr) // not present at the split point
+        {
+            cerr << 16 << endl;
+            if ((current_file == nullptr) && (given_file != nullptr)) // present only in the given branch
+            {
+                cerr << 14 << endl;
+                checkout(given_file->name, given_branch->commit); // Checkout the file
+                cerr << 15 << endl;
+                add(given_file->name, staged_files, tracked_files, head_commit); // stage the file for addition
+                stage_content(given_file->name);                                 // modify the index in the .gitlite directory
+            }
+            // else if ((given_file != nullptr) && (current_file != nullptr))
+            // {
+            //     if (given_file->ref != current_file->ref) // It was absent at the split point but present in both branches with different content.
+            //     {
+            //         list_put(conflict_files, given_file->name, "");
+            //     }
+            // }
+        }
+    }
+    cerr << 8 << endl;
     /*      6. Any files present at the split point, unmodified in the current branch, and absent in the given branch should be staged for removal.*/
 
     /*      7. Any files present at the split point, unmodified in the given branch, and absent in the current branch should remain absent.*/
@@ -726,7 +768,7 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
      *              c. It was absent at the split point but present in both branches with different content.
      *          · Replace the content of these files in the current working directory by the conflict resolution marker: (See add_conflict_marker(filename, ref) in Utils.cpp)
      *
-    /*              <<<<<<< HEAD
+     *              <<<<<<< HEAD
      *              contents of the file in the current branch
      *              =======
      *              contents of the file in the given branch
@@ -734,6 +776,29 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
      *
      *          · Stage these files for addition.
      *          · In addition, you need to call stage_content(filename) explicitly to modify the index in the .gitlite directory.*/
+    for (Blob *conflict_file = conflict_files->head->next; conflict_file != conflict_files->head; conflict_file = conflict_file->next)
+    {
+        add_conflict_marker(conflict_file->name, conflict_file->ref);       // conflict resolution marker
+        add(conflict_file->name, staged_files, tracked_files, head_commit); // Stage these files for addition
+        stage_content(conflict_file->name);                                 // modify the index in the .gitlite directory
+    }
+    cerr << 9 << endl;
+    /* 8. After processing the files, create a merge commit with message Merged [given branch name] into [current branch name].
+     *      · The first parent of the merge commit is the head commit of the current branch.
+     *      · The second parent of the merge commit is the head commit of the given branch.*/
+    commit(get_merge_commit_message(given_branch, current_branch), current_branch, staged_files, tracked_files, head_commit);
+    head_commit->second_parent = given_branch->commit; // second parent
 
-    return false;
+    // 9. If a conflict was ever encountered, print Encountered a merge conflict. (once is enough)
+    if (conflict_files->head->next != conflict_files->head)
+    {
+        cout << msg_encountered_merge_conflict << endl;
+    }
+
+    // 10. Return true.
+    // 11. If a commit error occurred, just print the error, ignore it and still return true.
+
+    list_delete(conflict_files);
+
+    return true;
 }
