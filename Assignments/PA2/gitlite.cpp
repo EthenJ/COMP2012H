@@ -668,7 +668,7 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
                 {
                     /* in conflict
                      * It is changed in both branches with different content.*/
-                    list_put(conflict_files, lca_file->name, lca_file->ref);
+                    list_put(conflict_files, lca_file->name, "");
                 }
             }
         }
@@ -676,21 +676,64 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
         {
             /*remain unchanged*/
         }
+        else if ((given_file != nullptr) && (current_file == nullptr) && // It is changed in one branch but deleted in another branch
+                 (given_file->ref != lca_file->ref))
+        {
+            list_put(conflict_files, lca_file->name, "");
+        }
+        else if ((current_file != nullptr) && (given_file == nullptr) && // It is changed in one branch but deleted in another branch
+                 (current_file->ref != lca_file->ref))
+        {
+            list_put(conflict_files, lca_file->name, "");
+        }
     }
 
     /*      4. Any files that were not present at the split point and are present only in the current branch should remained unchanged.*/
+    for (Blob *current_file = current_branch->commit->tracked_files->head->next;
+         current_file != current_branch->commit->tracked_files->head; current_file = current_file->next)
+    {
+        Blob *lca_file = list_find_name(split_point->tracked_files, current_file->name);
+        Blob *given_file = list_find_name(given_branch->commit->tracked_files, current_file->name);
+        if (lca_file == nullptr) // not present at the split point
+
+        {
+            if ((given_file == nullptr) && (current_file != nullptr)) // present only in the current branch
+            {
+                /*remained unchanged*/
+            }
+            else if ((given_file != nullptr) && (current_file != nullptr))
+            {
+                if (given_file->ref != current_file->ref) // It was absent at the split point but present in both branches with different content.
+                {
+                    list_put(conflict_files, given_file->name, "");
+                }
+            }
+        }
+    }
+
     /*      5. Any files that were not present at the split point and are present only in the given branch should be added with their versions in the given branch.
      *          · Checkout the files and stage the files for addition.
      *          · In addition, you need to call stage_content(filename) explicitly to modify the index in the .gitlite directory.*/
 
-    // Any files present at the split point, unmodified in the current branch, and absent in the given branch should be staged for removal.
-    // Any files present at the split point, unmodified in the given branch, and absent in the current branch should remain absent.
-    // Any files modified in different ways in the current branch and the given branch are in conflict.
-    // A file is modified in different ways if:
-    // It is changed in both branches with different content.
-    // It is changed in one branch but deleted in another branch.
-    // It was absent at the split point but present in both branches with different content.
-    // Replace the content of these files in the current working directory by the conflict resolution marker: (See add_conflict_marker(filename, ref) in Utils.cpp)
+    /*      6. Any files present at the split point, unmodified in the current branch, and absent in the given branch should be staged for removal.*/
+
+    /*      7. Any files present at the split point, unmodified in the given branch, and absent in the current branch should remain absent.*/
+
+    /*      8. Any files modified in different ways in the current branch and the given branch are in conflict.
+     *          · A file is modified in different ways if:
+     *              a. It is changed in both branches with different content.
+     *              b. It is changed in one branch but deleted in another branch.
+     *              c. It was absent at the split point but present in both branches with different content.
+     *          · Replace the content of these files in the current working directory by the conflict resolution marker: (See add_conflict_marker(filename, ref) in Utils.cpp)
+     *
+    /*              <<<<<<< HEAD
+     *              contents of the file in the current branch
+     *              =======
+     *              contents of the file in the given branch
+     *              >>>>>>>
+     *
+     *          · Stage these files for addition.
+     *          · In addition, you need to call stage_content(filename) explicitly to modify the index in the .gitlite directory.*/
 
     return false;
 }
