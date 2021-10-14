@@ -666,6 +666,8 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
                 }
                 else
                 {
+                    /* in conflict
+                     * It is changed in both branches with different content.*/
                     list_put(conflict_files, lca_file->name, lca_file->ref);
                 }
             }
