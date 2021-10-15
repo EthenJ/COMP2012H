@@ -595,6 +595,21 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
         return true;                                      // and return true.
     }
     // cerr << 3 << endl;
+
+    /* 6. Failure check: Traverse cwd_files,if there exists a file that is not tracked in the head commit of the current branch
+     *      but tracked in the head commit of the given branch, print There is an untracked file in the way; delete it, or add and commit it first. and return false.*/
+    for (Blob *cwd_file = cwd_files->head->next; cwd_file != cwd_files->head; cwd_file = cwd_file->next) // Traverse cwd_files
+    {
+        if (list_find_name(current_branch->commit->tracked_files, cwd_file->name) == nullptr)
+        {                                                                                       // not tracked in the head commit of the current branch
+            if (list_find_name(given_branch->commit->tracked_files, cwd_file->name) != nullptr) // but tracked in the head commit of the given branch
+            {
+                cout << msg_untracked_file << endl; // print There is an untracked file in the way; delete it, or add and commit it first
+                return false;                       // return false
+            }
+        }
+    }
+
     /* 4. If the split point is the head commit of the current branch, then all changes in the current branch exist in the given branch
      *      (the given branch is ahead of the current branch). Simply set the state of the repository to the head commit of the given branch (using one command above).
      *      If it succeeded, print Current branch fast-forwarded. and return true. If it failed, return false.*/
@@ -616,17 +631,6 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
     /* 5. Otherwise, the split point is neither the head commit of the current branch and the head commit of the given branch.
      *      Their history has diverged, like the above example. We need to incorporate the latest changes from both branches.*/
 
-    /* 6. Failure check: Traverse cwd_files,if there exists a file that is not tracked in the head commit of the current branch
-     *      but tracked in the head commit of the given branch, print There is an untracked file in the way; delete it, or add and commit it first. and return false.*/
-    for (Blob *cwd_file = cwd_files->head->next; cwd_file != cwd_files->head; cwd_file = cwd_file->next) // Traverse cwd_files
-    {
-        if ((list_find_name(current_branch->commit->tracked_files, cwd_file->name) == nullptr) && // not tracked in the head commit of the current branch
-            (list_find_name(given_branch->commit->tracked_files, cwd_file->name) != nullptr))     // but tracked in the head commit of the given branch
-        {
-            cout << msg_untracked_file << endl; // print There is an untracked file in the way; delete it, or add and commit it first
-            return false;                       // return false
-        }
-    }
     // cerr << 5 << endl;
     /* 7. Otherwise, proceed to merge the two branches with rules below. A general idea is to incorporate the latest changes from both branches.*/
 
