@@ -511,6 +511,7 @@ Blob *branch(const string &branch_name, List *branches, Commit *head_commit)
     }
 
     // The head commit of the repository becomes the head commit of the new branch.
+    // Add the new branch to branches.
     Blob *new_branch = list_put(branches, branch_name, head_commit);
 
     // Return a pointer to the new branch.
@@ -610,6 +611,12 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
         }
     }
 
+    // cerr << 4 << endl;
+    /* 5. Otherwise, the split point is neither the head commit of the current branch and the head commit of the given branch.
+     *      Their history has diverged, like the above example. We need to incorporate the latest changes from both branches.*/
+
+    // cerr << 5 << endl;
+    
     /* 4. If the split point is the head commit of the current branch, then all changes in the current branch exist in the given branch
      *      (the given branch is ahead of the current branch). Simply set the state of the repository to the head commit of the given branch (using one command above).
      *      If it succeeded, print Current branch fast-forwarded. and return true. If it failed, return false.*/
@@ -627,11 +634,7 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
             return false;
         }
     }
-    // cerr << 4 << endl;
-    /* 5. Otherwise, the split point is neither the head commit of the current branch and the head commit of the given branch.
-     *      Their history has diverged, like the above example. We need to incorporate the latest changes from both branches.*/
 
-    // cerr << 5 << endl;
     /* 7. Otherwise, proceed to merge the two branches with rules below. A general idea is to incorporate the latest changes from both branches.*/
 
     List *conflict_files = list_new();
