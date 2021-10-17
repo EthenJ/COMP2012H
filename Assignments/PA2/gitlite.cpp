@@ -71,7 +71,7 @@ void init(Blob *&current_branch, List *&branches, List *&staged_files, List *&tr
     head_commit->parent = nullptr;                                              // has no parents
 
     // 3. Create a branch called master and set it as the current branch.
-    current_branch = list_put(branches, "master", ""); // ref remains empty when representing a branch.
+    current_branch = list_put(branches, "master", string()); // ref remains empty when representing a branch.
     // Add the initial commit to the branch. Set the head commit of the repository as well.
     current_branch->commit = head_commit; // Add the initial commit to the branch
                                           // Set the head commit of the repository as well.
@@ -762,7 +762,7 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
             // {
             //     if (given_file->ref != current_file->ref) // It was absent at the split point but present in both branches with different content.
             //     {
-            //         list_put(conflict_files, given_file->name, "");
+            //         list_put(conflict_files, given_file->name, string());
             //     }
             // }
         }

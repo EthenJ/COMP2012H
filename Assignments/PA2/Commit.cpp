@@ -10,8 +10,8 @@ List *list_new()
     List *new_list = new List;   // create a new list
     (*new_list).head = new Blob; // create its head
 
-    (*((*new_list).head)).name = ""; // For Blob sentinel nodes, you should set name and ref to empty strings, and commit to nullptr
-    (*((*new_list).head)).ref = "";
+    (*((*new_list).head)).name = string(); // For Blob sentinel nodes, you should set name and ref to empty strings, and commit to nullptr
+    (*((*new_list).head)).ref = string();
     (*((*new_list).head)).commit = nullptr;
 
     (*((*new_list).head)).prev = ((*new_list).head); // The head is the only blob in the new list
@@ -212,22 +212,22 @@ void commit_print(const Commit *commit)
 /* for get_lca() */
 
 void commit_mark(List *marked_commits, Commit *commit)
-// put the commit with all of its parents (including second parent) into a list
+// put the commit with all of its ancestors into a list
 {
     if (commit == nullptr)
     {
         return;
     }
 
-    list_put(marked_commits, commit->commit_id, commit); // if the commit is not nullptr, mark it
+    list_put(marked_commits, commit->commit_id, string()); // if the commit is not nullptr, mark it
 
     // continue with its parent and second parent
-    commit_mark(marked_commits, commit->parent);
-    commit_mark(marked_commits, commit->second_parent);
+    commit_mark(marked_commits, commit->parent);        // parent
+    commit_mark(marked_commits, commit->second_parent); // second parent
 }
 
 void commit_find(List *marked_commits, Commit *commit, Commit *&lca)
-// check whether the commit or its parents (including second parent) is marked
+// check whether the commit or its ancestors is marked, and return the first marked one (lca)
 {
     if ((lca != nullptr) || commit == nullptr)
     {
@@ -237,20 +237,20 @@ void commit_find(List *marked_commits, Commit *commit, Commit *&lca)
     Blob *lca_blob = list_find_name(marked_commits, commit->commit_id);
     if (lca_blob != nullptr)
     {
-        lca = lca_blob->commit; // if the commit is marked, return it
+        lca = commit; // if the commit is marked, return it
     }
 
     // continue with its parent and second parent
-    commit_find(marked_commits, commit->parent, lca);
-    commit_find(marked_commits, commit->second_parent, lca);
+    commit_find(marked_commits, commit->parent, lca);        // parent
+    commit_find(marked_commits, commit->second_parent, lca); // second parent
 }
 
 Commit *get_lca(Commit *c1, Commit *c2)
 {
-    List *marked_commits = list_new();
-    commit_mark(marked_commits, c2);
-    Commit *lca = nullptr;
-    commit_find(marked_commits, c1, lca);
-    list_delete(marked_commits);
+    List *marked_commits = list_new();    // make a list to store our marked commits
+    commit_mark(marked_commits, c2);      // mark c2 and its ancestors
+    Commit *lca = nullptr;                // the return commit
+    commit_find(marked_commits, c1, lca); // go through c1 and its ancestors to find lca
+    list_delete(marked_commits);          // delete our temp list avoid memory leak
     return lca;
 }
