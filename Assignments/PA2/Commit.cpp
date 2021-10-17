@@ -209,94 +209,48 @@ void commit_print(const Commit *commit)
          << commit->message;
 }
 
-// Check whether a is b's ancestor (including themselves)
-void is_ancestor(Commit *a, Commit *b, bool &m)
+/* for get_lca() */
+
+void commit_mark(List *marked_commits, Commit *commit)
+// put the commit with all of its parents (including second parent) into a list
 {
-    if (m || a == nullptr || b == nullptr)
+    if (commit == nullptr)
     {
         return;
     }
-    if (a == b)
-    {
-        m = true;
-        return;
-    }
-    if (b->parent != nullptr)
-    {
-        is_ancestor(a, b->parent, m);
-    }
-    if (b->second_parent != nullptr)
-    {
-        is_ancestor(a, b->second_parent, m);
-    }
+
+    list_put(marked_commits, commit->commit_id, commit); // if the commit is not nullptr, mark it
+
+    // continue with its parent and second parent
+    commit_mark(marked_commits, commit->parent);
+    commit_mark(marked_commits, commit->second_parent);
 }
 
-//  Find ancestor(consider first parent first, including themselves)
-void find_ancestor_f(Commit *a, Commit *b, Commit *&ancestor_f)
+void commit_find(List *marked_commits, Commit *commit, Commit *&lca)
+// check whether the commit or its parents (including second parent) is marked
 {
-    if (ancestor_f != nullptr || a == nullptr || b == nullptr)
+    if ((lca != nullptr) || commit == nullptr)
     {
         return;
     }
-    bool a_is_ancestor = false;
-    is_ancestor(a, b, a_is_ancestor);
-    if (a_is_ancestor)
-    {
-        ancestor_f = a;
-        return;
-    }
-    if (a->parent != nullptr)
-    {
-        find_ancestor_f(a->parent, b, ancestor_f);
-    }
-    if (a->second_parent != nullptr)
-    {
-        find_ancestor_f(a->second_parent, b, ancestor_f);
-    }
-}
 
-//  Find ancestor(consider second parent first, including themselves)
-void find_ancestor_s(Commit *a, Commit *b, Commit *&ancestor_s)
-{
-    if (ancestor_s != nullptr || a == nullptr || b == nullptr)
+    Blob *lca_blob = list_find_name(marked_commits, commit->commit_id);
+    if (lca_blob != nullptr)
     {
-        return;
+        lca = lca_blob->commit; // if the commit is marked, return it
     }
-    bool a_is_ancestor = false;
-    is_ancestor(a, b, a_is_ancestor);
-    if (a_is_ancestor)
-    {
-        ancestor_s = a;
-        return;
-    }
-    if (a->second_parent != nullptr)
-    {
-        find_ancestor_f(a->second_parent, b, ancestor_s);
-    }
-    if (a->parent != nullptr)
-    {
-        find_ancestor_f(a->parent, b, ancestor_s);
-    }
+
+    // continue with its parent and second parent
+    commit_find(marked_commits, commit->parent, lca);
+    commit_find(marked_commits, commit->second_parent, lca);
 }
 
 Commit *get_lca(Commit *c1, Commit *c2)
 {
-    Commit *ancestor_f = nullptr;
-    Commit *ancestor_s = nullptr;
-    find_ancestor_f(c1, c2, ancestor_f);
-    find_ancestor_s(c1, c2, ancestor_s);
-    if (ancestor_f == ancestor_s)
-    {
-        return ancestor_f;
-    }
-    bool m = false; // indicate whether f is s's ancestor
-    is_ancestor(ancestor_f, ancestor_s, m);
-    if (m) // f is s's ancestor => f is older than s
-    {
-        return ancestor_s;
-    }
-    else
-    {
-        return ancestor_f;
-    }
+    List *marked_commits = list_new();
+    commit_mark(marked_commits, c2);
+    Commit *lca = nullptr;
+    commit_find(marked_commits, c1, lca);
+    list_delete(marked_commits);
+    return lca;
 }
