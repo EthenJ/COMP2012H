@@ -587,6 +587,10 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
      *                             --- n1 --- n2 (head of new)*/
     Commit *split_point = get_lca(current_branch->commit, given_branch->commit);
 
+    // commit_print(split_point);
+    // cout << endl
+    //      << endl;
+
     /* 3. If the split point is the head commit of the given branch, then all changes in the given branch exist in the current branch
      *      (the current branch is ahead of the given branch). So there is nothing to be done in the current branch.
      *      Simply print Given branch is an ancestor of the current branch. and return true.*/
@@ -616,7 +620,7 @@ bool merge(const string &branch_name, Blob *&current_branch, List *branches, Lis
      *      Their history has diverged, like the above example. We need to incorporate the latest changes from both branches.*/
 
     // cerr << 5 << endl;
-    
+
     /* 4. If the split point is the head commit of the current branch, then all changes in the current branch exist in the given branch
      *      (the given branch is ahead of the current branch). Simply set the state of the repository to the head commit of the given branch (using one command above).
      *      If it succeeded, print Current branch fast-forwarded. and return true. If it failed, return false.*/
