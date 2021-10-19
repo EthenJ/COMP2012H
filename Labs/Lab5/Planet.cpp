@@ -53,14 +53,12 @@ void Planet::update_acceleration()
 	// START OF YOUR IMPLEMENTATION
 	if (activated)
 	{
-		ax = 0;
-		ay = 0;
+		ax = 0, ay = 0;
 		for (int j = 0; j < MAX_PLANETS; j++)
 		{
 			if (planets[j].activated && j != uid)
 			{
-				double dx = planets[j].x - x;
-				double dy = planets[j].y - y;
+				double dx = planets[j].x - x, dy = planets[j].y - y;
 				double r = std::hypot(dx, dy);
 				ax += planets[j].mass * dx / (r * r * r);
 				ay += planets[j].mass * dy / (r * r * r);
@@ -80,8 +78,7 @@ void Planet::update_velocity()
 	// START OF YOUR IMPLEMENTATION
 	if (activated)
 	{
-		vx += ax / (STEPS * FPS);
-		vy += ay / (STEPS * FPS);
+		vx += ax / (STEPS * FPS), vy += ay / (STEPS * FPS);
 	}
 	// END OF YOUR IMPLEMENTATION
 }
@@ -94,8 +91,7 @@ void Planet::update_displacement()
 	// START OF YOUR IMPLEMENTATION
 	if (activated)
 	{
-		x += vx / (STEPS * FPS);
-		y += vy / (STEPS * FPS);
+		x += vx / (STEPS * FPS), y += vy / (STEPS * FPS);
 	}
 	// END OF YOUR IMPLEMENTATION
 }
