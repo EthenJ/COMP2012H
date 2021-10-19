@@ -211,6 +211,28 @@ void commit_print(const Commit *commit)
 
 /* for get_lca() */
 
+// Check whether a is b's ancestor (including themselves)
+void is_ancestor(Commit *a, Commit *b, bool &m)
+{
+    if (m || a == nullptr || b == nullptr)
+    {
+        return;
+    }
+    if (a == b)
+    {
+        m = true;
+        return;
+    }
+    if (b->parent != nullptr)
+    {
+        is_ancestor(a, b->parent, m);
+    }
+    if (b->second_parent != nullptr)
+    {
+        is_ancestor(a, b->second_parent, m);
+    }
+}
+
 void commit_mark(List *marked_commits, Commit *commit)
 // put the commit with all of its ancestors into a list
 {
@@ -229,7 +251,14 @@ void commit_mark(List *marked_commits, Commit *commit)
 void commit_find(List *marked_commits, Commit *commit, Commit *&lca)
 // check whether the commit or its ancestors is marked, and return the first marked one (lca)
 {
-    if ((lca != nullptr) || commit == nullptr)
+    if (commit == nullptr)
+    {
+        return;
+    }
+    
+    bool m = false;
+    is_ancestor(commit, lca, m);
+    if (m) // the commit is older than the one we've found
     {
         return;
     }
@@ -251,6 +280,6 @@ Commit *get_lca(Commit *c1, Commit *c2)
     commit_mark(marked_commits, c2);      // mark c2 and its ancestors
     Commit *lca = nullptr;                // the return commit
     commit_find(marked_commits, c1, lca); // go through c1 and its ancestors to find lca
-    list_delete(marked_commits);          // delete our temp list avoid memory leak
+    list_delete(marked_commits);          // delete our temp list to avoid memory leak
     return lca;
 }
