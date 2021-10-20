@@ -215,31 +215,23 @@ void commit_print(const Commit *commit)
 void is_ancestor(Commit *a, Commit *b, bool &m)
 {
     if (m || a == nullptr || b == nullptr)
-    {
         return;
-    }
+
     if (a == b)
     {
         m = true;
         return;
     }
-    if (b->parent != nullptr)
-    {
-        is_ancestor(a, b->parent, m);
-    }
-    if (b->second_parent != nullptr)
-    {
-        is_ancestor(a, b->second_parent, m);
-    }
+
+    is_ancestor(a, b->parent, m);
+    is_ancestor(a, b->second_parent, m);
 }
 
 void commit_mark(List *marked_commits, Commit *commit)
 // put the commit with all of its ancestors into a list
 {
     if (commit == nullptr)
-    {
         return;
-    }
 
     list_put(marked_commits, commit->commit_id, string()); // if the commit is not nullptr, mark it
 
@@ -252,22 +244,16 @@ void commit_find(List *marked_commits, Commit *commit, Commit *&lca)
 // check whether the commit or its ancestors is marked, and return the first marked one (lca)
 {
     if (commit == nullptr)
-    {
         return;
-    }
-    
+
     bool m = false;
     is_ancestor(commit, lca, m);
     if (m) // the commit is older than the one we've found
-    {
         return;
-    }
 
     Blob *lca_blob = list_find_name(marked_commits, commit->commit_id);
     if (lca_blob != nullptr)
-    {
         lca = commit; // if the commit is marked, return it
-    }
 
     // continue with its parent and second parent
     commit_find(marked_commits, commit->parent, lca);        // parent
@@ -281,5 +267,8 @@ Commit *get_lca(Commit *c1, Commit *c2)
     Commit *lca = nullptr;                // the return commit
     commit_find(marked_commits, c1, lca); // go through c1 and its ancestors to find lca
     list_delete(marked_commits);          // delete our temp list to avoid memory leak
+    // commit_print(lca);
+    // cout << endl
+    //      << endl;
     return lca;
 }
