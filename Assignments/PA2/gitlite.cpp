@@ -390,12 +390,11 @@ bool checkout(const string &branch_name, Blob *&current_branch, const List *bran
     //  delete it, or add and commit it first. and return false.
     for (Blob *cwd_file = cwd_files->head->next; cwd_file != cwd_files->head; cwd_file = cwd_file->next)
     {
-        string ref = get_sha1(cwd_file->name);
         Blob *tracked_file = list_find_name(tracked_files, cwd_file->name);
         if (tracked_file == nullptr) // untracked file
         {
             Blob *target_file = list_find_name(target_branch->commit->tracked_files, cwd_file->name);
-            if ((target_file != nullptr) && (target_file->ref != ref))
+            if (target_file != nullptr)
             {
                 cout << msg_untracked_file << endl;
                 return false;
@@ -455,11 +454,10 @@ bool reset(Commit *commit, Blob *current_branch, List *staged_files, List *track
     //          print There is an untracked file in the way; delete it, or add and commit it first. and return false.
     for (Blob *cwd_file = cwd_files->head->next; cwd_file != cwd_files->head; cwd_file = cwd_file->next)
     {
-        string ref = get_sha1(cwd_file->name);
         if (list_find_name(tracked_files, cwd_file->name) == nullptr) // untracked file
         {
             Blob *target_file = list_find_name(commit->tracked_files, cwd_file->name);
-            if ((target_file != nullptr) && (target_file->ref != ref))
+            if (target_file != nullptr)
             {
                 cout << msg_untracked_file << endl;
                 return false;
