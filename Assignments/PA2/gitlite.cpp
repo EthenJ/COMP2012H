@@ -170,7 +170,7 @@ bool remove(const string &filename, List *staged_files, List *tracked_files, con
     }
 
     // 2. If the file was staged for addition, remove it from the tracked files of the repository and the staging area.
-    if (list_find_name(tracked_files, filename) != nullptr) // not in head_commit->tracked_files, but in tracked_files
+    if (list_find_name(staged_files, filename) != nullptr) // staged for addition
     {
         list_remove(tracked_files, filename); // remove it from the tracked files of the repository
         list_remove(staged_files, filename);  // remove it from the tracked files of the staging area
@@ -340,7 +340,6 @@ void status(const Blob *current_branch, const List *branches, const List *staged
 
 bool checkout(const string &filename, Commit *commit)
 {
-    Blob *committed_file = list_find_name(commit->tracked_files, filename);
     // 1. Failure check:
     //      If commit is nullptr, then the wrapper function cannot find the commit with the commit id.
     if (commit == nullptr)
@@ -350,8 +349,9 @@ bool checkout(const string &filename, Commit *commit)
         return false;
     }
 
+    Blob *committed_file = list_find_name(commit->tracked_files, filename);
     //      If the file is not tracked by the commit,
-    else if (committed_file == nullptr)
+    if (committed_file == nullptr)
     {
         //       print File does not exist in that commit. and return false.
         cout << msg_file_does_not_exist << endl;
