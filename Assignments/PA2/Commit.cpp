@@ -44,18 +44,18 @@ Blob *list_find_name(const List *list, const string &name)
 Blob *list_put(List *list, const string &name, const string &ref) // Put a blob with the given name and content (ref or commit) to the linked list.
 {
     Blob *new_blob = list_find_name(list, name);
-    if (new_blob != nullptr) // If a blob with the same name exists in the linked list,
+    if (new_blob != nullptr) //If a blob with the same name exists in the linked list,
     {
-        (*new_blob).ref = ref; // update the blob by replacing the content (ref or commit) with the given content (ref or commit).
+        (*new_blob).ref = ref; //update the blob by replacing the content (ref or commit) with the given content (ref or commit).
         return new_blob;
     }
 
-    // If no blobs with the same name exists in the linked list
-    // create a new blob with the given content (ref or commit)
+    //If no blobs with the same name exists in the linked list
+    //create a new blob with the given content (ref or commit)
     new_blob = new Blob;
     (*new_blob).name = name;
     (*new_blob).ref = ref;
-    // and insert it to the linked list with the name following ascending lexicographic order.
+    //and insert it to the linked list with the name following ascending lexicographic order.
 
     if (name < (*((*((*list).head)).next)).name) // head < new < 1st
     {
@@ -89,18 +89,18 @@ Blob *list_put(List *list, const string &name, const string &ref) // Put a blob 
 Blob *list_put(List *list, const string &name, Commit *commit)
 {
     Blob *new_blob = list_find_name(list, name);
-    if (new_blob != nullptr) // If a blob with the same name exists in the linked list,
+    if (new_blob != nullptr) //If a blob with the same name exists in the linked list,
     {
-        (*new_blob).commit = commit; // update the blob by replacing the content (ref or commit) with the given content (ref or commit).
+        (*new_blob).commit = commit; //update the blob by replacing the content (ref or commit) with the given content (ref or commit).
         return new_blob;
     }
 
-    // If no blobs with the same name exists in the linked list
-    // create a new blob with the given content (ref or commit)
+    //If no blobs with the same name exists in the linked list
+    //create a new blob with the given content (ref or commit)
     new_blob = new Blob;
     (*new_blob).name = name;
     (*new_blob).commit = commit;
-    // and insert it to the linked list with the name following ascending lexicographic order.
+    //and insert it to the linked list with the name following ascending lexicographic order.
 
     if (name < (*((*((*list).head)).next)).name) // head < new < 1st
     {
@@ -172,7 +172,7 @@ void list_delete(List *list)
     list = nullptr;
 }
 
-void list_replace(List *list, const List *another) // Replace the linked list with the given another linked list, maintaining the order of blobs. Deep copy the blobs in the process.
+void list_replace(List *list, const List *another) //Replace the linked list with the given another linked list, maintaining the order of blobs. Deep copy the blobs in the process.
 {
     list_clear(list);
     for (Blob *this_blob = (*((*another).head)).next; this_blob != (*another).head; this_blob = (*this_blob).next) // search until reach the head
@@ -209,17 +209,66 @@ void commit_print(const Commit *commit)
          << commit->message;
 }
 
+/* for get_lca() */
+
+// Check whether a is b's ancestor (including themselves)
+void is_ancestor(Commit *a, Commit *b, bool &m)
+{
+    if (m || a == nullptr || b == nullptr)
+        return;
+
+    if (a == b)
+    {
+        m = true;
+        return;
+    }
+
+    is_ancestor(a, b->parent, m);
+    is_ancestor(a, b->second_parent, m);
+}
+
+void commit_mark(List *marked_commits, Commit *commit)
+// put the commit with all of its ancestors into a list
+{
+    if (commit == nullptr)
+        return;
+
+    list_put(marked_commits, commit->commit_id, string()); // if the commit is not nullptr, mark it
+
+    // continue with its parent and second parent
+    commit_mark(marked_commits, commit->parent);        // parent
+    commit_mark(marked_commits, commit->second_parent); // second parent
+}
+
+void commit_find(List *marked_commits, Commit *commit, Commit *&lca)
+// check whether the commit or its ancestors is marked, and return the first marked one (lca)
+{
+    if (commit == nullptr)
+        return;
+
+    bool m = false;
+    is_ancestor(commit, lca, m);
+    if (m) // the commit is older than the one we've found
+        return;
+
+    Blob *lca_blob = list_find_name(marked_commits, commit->commit_id);
+    if (lca_blob != nullptr)
+        lca = commit; // if the commit is marked, return it
+
+    // continue with its parent and second parent
+    commit_find(marked_commits, commit->parent, lca);        // parent
+    commit_find(marked_commits, commit->second_parent, lca); // second parent
+}
+
 Commit *get_lca(Commit *c1, Commit *c2)
 {
-    for (Commit *m = c1; m != nullptr; m = m->parent)
-    {
-        for (Commit *this_commit = c2; this_commit != nullptr; this_commit = this_commit->parent)
-        {
-            if (this_commit == m)
-            {
-                return this_commit;
-            }
-        }
-    }
-    return nullptr;
+    List *marked_commits = list_new();    // make a list to store our marked commits
+    commit_mark(marked_commits, c2);      // mark c2 and its ancestors
+    Commit *lca = nullptr;                // the return commit
+    commit_find(marked_commits, c1, lca); // go through c1 and its ancestors to find lca
+    list_delete(marked_commits);          // delete our temp list to avoid memory leak
+    // commit_print(lca);
+    // cout << endl
+    //      << endl;
+    return lca;
 }
