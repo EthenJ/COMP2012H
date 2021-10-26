@@ -1,0 +1,30 @@
+I tests/definitions.inc
+
+> init
+<<<
+
+> branch abranch
+<<<
+
+> branch zbranch
+<<<
+
+> branch new
+<<<
+
+> status
+=== Branches ===
+abranch
+\*master
+new
+zbranch
+
+=== Staged Files ===
+
+=== Removed Files ===
+  
+=== Modifications Not Staged For Commit ===
+  
+=== Untracked Files ===
+${ARBLINES}
+<<<

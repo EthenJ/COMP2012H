@@ -1,0 +1,33 @@
+I tests/definitions.inc
+
+> init
+<<<
+
++ text1.txt text1.txt
+
+> add text1.txt
+<<<
+
+> commit "added text1"
+<<<
+
+> branch abranch
+<<<
+
++ text1.txt text2.txt
+
+> add text1.txt
+<<<
+
+> commit "updated text2"
+<<<
+
+> checkout abranch
+<<<
+
+= text1.txt text1.txt
+
+> checkout master
+<<<
+
+= text1.txt text2.txt

@@ -1,0 +1,40 @@
+I tests/definitions.inc
+
+> init
+<<<
+
++ text1.txt text1.txt
+
+> add text1.txt
+<<<
+
+> commit "added text1"
+<<<
+
+> branch abranch
+<<<
+
++ text1.txt text2.txt
+
+> add text1.txt
+<<<
+
+> checkout abranch
+<<<
+
+= text1.txt text1.txt
+
+> status
+=== Branches ===
+\*abranch
+master
+  
+=== Staged Files ===
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+  
+=== Untracked Files ===
+${ARBLINES}
+<<<

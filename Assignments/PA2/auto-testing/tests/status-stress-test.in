@@ -1,0 +1,255 @@
+I tests/definitions.inc
+
+> init
+<<<
+
+> branch abranch
+<<<
+
+> branch zbranch
+<<<
+
+> branch new
+<<<
+
++ 1Removed.txt text1.txt
++ 5Removed.txt text1.txt
++ aRemoved.txt text1.txt
++ iRemoved.txt text1.txt
++ nRemoved.txt text1.txt
++ zRemoved.txt text1.txt
+
++ 1Case1.txt text1.txt
++ 5Case1.txt text1.txt
++ aCase1.txt text1.txt
++ iCase1.txt text1.txt
++ nCase1.txt text1.txt
++ zCase1.txt text1.txt
+
++ 1Case4.txt text1.txt
++ 5Case4.txt text1.txt
++ aCase4.txt text1.txt
++ iCase4.txt text1.txt
++ nCase4.txt text1.txt
++ zCase4.txt text1.txt
+
+> add 1Removed.txt
+<<<
+> add 5Removed.txt
+<<<
+> add aRemoved.txt
+<<<
+> add iRemoved.txt
+<<<
+> add nRemoved.txt
+<<<
+> add zRemoved.txt
+<<<
+
+> add 1Case1.txt
+<<<
+> add 5Case1.txt
+<<<
+> add aCase1.txt
+<<<
+> add iCase1.txt
+<<<
+> add nCase1.txt
+<<<
+> add zCase1.txt
+<<<
+
+> add 1Case4.txt
+<<<
+> add 5Case4.txt
+<<<
+> add aCase4.txt
+<<<
+> add iCase4.txt
+<<<
+> add nCase4.txt
+<<<
+> add zCase4.txt
+<<<
+
+> commit "added files"
+<<<
+
++ 1Staged.txt text1.txt
++ 5Staged.txt text1.txt
++ aStaged.txt text1.txt
++ iStaged.txt text1.txt
++ nStaged.txt text1.txt
++ zStaged.txt text1.txt
+
++ 1Case2.txt text1.txt
++ 5Case2.txt text1.txt
++ aCase2.txt text1.txt
++ iCase2.txt text1.txt
++ nCase2.txt text1.txt
++ zCase2.txt text1.txt
+
++ 1Case3.txt text1.txt
++ 5Case3.txt text1.txt
++ aCase3.txt text1.txt
++ iCase3.txt text1.txt
++ nCase3.txt text1.txt
++ zCase3.txt text1.txt
+
++ 1Untracked.txt text1.txt
++ 5Untracked.txt text1.txt
++ aUntracked.txt text1.txt
++ iUntracked.txt text1.txt
++ nUntracked.txt text1.txt
++ zUntracked.txt text1.txt
+
+> add 1Staged.txt
+<<<
+> add 5Staged.txt
+<<<
+> add aStaged.txt
+<<<
+> add iStaged.txt
+<<<
+> add nStaged.txt
+<<<
+> add zStaged.txt
+<<<
+
+> add 1Case2.txt
+<<<
+> add 5Case2.txt
+<<<
+> add aCase2.txt
+<<<
+> add iCase2.txt
+<<<
+> add nCase2.txt
+<<<
+> add zCase2.txt
+<<<
+
+> add 1Case3.txt
+<<<
+> add 5Case3.txt
+<<<
+> add aCase3.txt
+<<<
+> add iCase3.txt
+<<<
+> add nCase3.txt
+<<<
+> add zCase3.txt
+<<<
+
++ 1Case1.txt text2.txt
++ 5Case1.txt text2.txt
++ aCase1.txt text2.txt
++ iCase1.txt text2.txt
++ nCase1.txt text2.txt
++ zCase1.txt text2.txt
+
++ 1Case2.txt text2.txt
++ 5Case2.txt text2.txt
++ aCase2.txt text2.txt
++ iCase2.txt text2.txt
++ nCase2.txt text2.txt
++ zCase2.txt text2.txt
+
+- 1Case3.txt
+- 5Case3.txt
+- aCase3.txt
+- iCase3.txt
+- nCase3.txt
+- zCase3.txt
+
+- 1Case4.txt
+- 5Case4.txt
+- aCase4.txt
+- iCase4.txt
+- nCase4.txt
+- zCase4.txt
+
+> rm 1Removed.txt
+<<<
+> rm 5Removed.txt
+<<<
+> rm aRemoved.txt
+<<<
+> rm iRemoved.txt
+<<<
+> rm nRemoved.txt
+<<<
+> rm zRemoved.txt
+<<<
+
+> status
+=== Branches ===
+abranch
+\*master
+new
+zbranch
+
+=== Staged Files ===
+1Case2.txt
+1Case3.txt
+1Staged.txt
+5Case2.txt
+5Case3.txt
+5Staged.txt
+aCase2.txt
+aCase3.txt
+aStaged.txt
+iCase2.txt
+iCase3.txt
+iStaged.txt
+nCase2.txt
+nCase3.txt
+nStaged.txt
+zCase2.txt
+zCase3.txt
+zStaged.txt
+
+=== Removed Files ===
+1Removed.txt
+5Removed.txt
+aRemoved.txt
+iRemoved.txt
+nRemoved.txt
+zRemoved.txt
+  
+=== Modifications Not Staged For Commit ===
+1Case1.txt \(modified\)
+1Case2.txt \(modified\)
+1Case3.txt \(deleted\)
+1Case4.txt \(deleted\)
+5Case1.txt \(modified\)
+5Case2.txt \(modified\)
+5Case3.txt \(deleted\)
+5Case4.txt \(deleted\)
+aCase1.txt \(modified\)
+aCase2.txt \(modified\)
+aCase3.txt \(deleted\)
+aCase4.txt \(deleted\)
+iCase1.txt \(modified\)
+iCase2.txt \(modified\)
+iCase3.txt \(deleted\)
+iCase4.txt \(deleted\)
+nCase1.txt \(modified\)
+nCase2.txt \(modified\)
+nCase3.txt \(deleted\)
+nCase4.txt \(deleted\)
+zCase1.txt \(modified\)
+zCase2.txt \(modified\)
+zCase3.txt \(deleted\)
+zCase4.txt \(deleted\)
+  
+=== Untracked Files ===
+1Untracked.txt
+5Untracked.txt
+aUntracked.txt
+iUntracked.txt
+nUntracked.txt
+zUntracked.txt
+${ARBLINES}
+<<<

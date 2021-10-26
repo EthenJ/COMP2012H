@@ -1,0 +1,48 @@
+I tests/definitions.inc
+
+> init
+<<<
+
+> branch new
+<<<
+
++ text1.txt text1.txt
+
+> add text1.txt
+<<<
+
+> commit "added text1"
+<<<
+
+> checkout new
+<<<
+
++ text1.txt text1.txt
+
+> add text1.txt
+<<<
+
+> commit "added text1 new"
+<<<
+
+> checkout master
+<<<
+
+> merge new
+No changes added to the commit.
+<<<
+
+= text1.txt text1.txt
+
+> log
+===
+${COMMIT_HEAD}
+
+added text1
+
+===
+${COMMIT_HEAD}
+
+initial commit
+
+<<<

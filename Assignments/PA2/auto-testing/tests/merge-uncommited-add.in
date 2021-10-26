@@ -1,0 +1,16 @@
+I tests/definitions.inc
+
+> init
+<<<
+
+> branch new
+<<<
+
++ text1.txt text1.txt
+
+> add text1.txt
+<<<
+
+> merge new
+You have uncommitted changes.
+<<<

@@ -1,0 +1,8 @@
+I tests/definitions.inc
+
+> init
+<<<
+
+> rm-branch master
+Cannot remove the current branch.
+<<<

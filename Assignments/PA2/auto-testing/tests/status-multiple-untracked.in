@@ -1,0 +1,33 @@
+I tests/definitions.inc
+
+> init
+<<<
+
++ 123.txt text1.txt
++ 456.txt text1.txt
++ abc.txt text1.txt
++ ijk.txt text1.txt
++ mno.txt text1.txt
++ tuv.txt text1.txt
++ xyz.txt text1.txt
+
+> status
+=== Branches ===
+\*master
+  
+=== Staged Files ===
+
+=== Removed Files ===
+  
+=== Modifications Not Staged For Commit ===
+  
+=== Untracked Files ===
+123.txt
+456.txt
+abc.txt
+ijk.txt
+mno.txt
+tuv.txt
+xyz.txt
+${ARBLINES}
+<<<

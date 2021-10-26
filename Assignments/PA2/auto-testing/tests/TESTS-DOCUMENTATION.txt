@@ -1,0 +1,40 @@
+
+=======================================================
+add-already-staged
+=======================================================
+Adds and commits a file, then modifies the file externally
+The modified file is added
+The modified file is reverted to the original version externally
+The reverted file is added
+
+Target behaviour:
+The staged file should be removed. (Ref: add 1.2)
+
+=======================================================
+add-changed-file-staged-for-removal
+=======================================================
+Adds and commits a file, then stages the file for removal using rm
+A file with same name but different content is added externally
+The new file is added
+
+Target behaviour:
+The file should no longer be staged for removal, and should be staged for addition (Ref: add 1.1,1.2)
+
+=======================================================
+add-identical-file-staged-for-removal
+=======================================================
+Adds and commits a file, then stages the file for removal using rm
+The original file is readded externally
+The readded file is added
+
+Target behaviour:
+The file should no longer be staged for removal. (Ref: add 1.2)
+
+=======================================================
+commit-no-changes
+=======================================================
+Adds and commits a file, then commits again
+
+Target behaviour:
+Should output "No changes added to the commit." (Ref: commit 1.1)
+

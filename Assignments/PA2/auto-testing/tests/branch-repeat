@@ -1,0 +1,11 @@
+I tests/definitions.inc
+
+> init
+<<<
+
+> branch abranch
+<<<
+
+> branch abranch
+A branch with that name already exists.
+<<<

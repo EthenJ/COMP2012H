@@ -1,0 +1,16 @@
+I tests/definitions.inc
+
+> init
+<<<
+
++ text1.txt text1.txt
+
+> add text1.txt
+<<<
+
+> commit "added file1"
+<<<
+
+> commit "failed commit"
+No changes added to the commit.
+<<<

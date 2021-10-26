@@ -1,0 +1,8 @@
+I tests/definitions.inc
+
+> init
+<<<
+
+> checkout f92a -- notexist.txt
+No commit with that id exists.
+<<<

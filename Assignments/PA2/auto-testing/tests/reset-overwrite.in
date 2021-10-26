@@ -1,0 +1,43 @@
+I tests/definitions.inc
+
+> init
+<<<
+
++ text1.txt text1.txt
+
+> add text1.txt
+<<<
+
+> commit "added text1"
+<<<
+
++ text1.txt text2.txt
+
+> add text1.txt
+<<<
+
+> commit "updated text1"
+<<<
+
+> log
+===
+${COMMIT_HEAD}
+
+updated text1
+
+===
+${COMMIT_HEAD}
+
+added text1
+
+===
+${COMMIT_HEAD}
+
+initial commit
+
+<<<
+
+> reset ${2}
+<<<
+
+= text1.txt text1.txt

@@ -1,0 +1,54 @@
+I tests/definitions.inc
+
+> init
+<<<
+
++ text1.txt text1.txt
++ text2.txt text1.txt
+
+> add text1.txt
+<<<
+
+> add text2.txt
+<<<
+
+> commit "added files"
+<<<
+
+> branch new
+<<<
+
+> rm text2.txt
+<<<
+
++ text1.txt text2.txt
+
+> add text1.txt
+<<<
+
+> commit "changed master"
+<<<
+
+> checkout new
+<<<
+
+> rm text1.txt
+<<<
+
++ text2.txt text2.txt
+
+> add text2.txt
+<<<
+
+> commit "changed new"
+<<<
+
+> checkout master
+<<<
+
+> merge new
+Encountered a merge conflict.
+<<<
+
+= text1.txt text2_0.txt
+= text2.txt text0_2.txt

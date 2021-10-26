@@ -1,0 +1,10 @@
+I tests/definitions.inc
+
+> init
+<<<
+
+> branch abranch
+<<<
+
+> rm-branch abranch
+<<<

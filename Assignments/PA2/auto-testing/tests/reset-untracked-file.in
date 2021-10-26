@@ -1,0 +1,42 @@
+I tests/definitions.inc
+
+> init
+<<<
+
++ text1.txt text1.txt
+
+> add text1.txt
+<<<
+
+> commit "added text1"
+<<<
+
+> rm text1.txt
+<<<
+
+> commit "removed text1"
+<<<
+
++ text1.txt text1.txt
+
+> log
+===
+${COMMIT_HEAD}
+
+removed text1
+
+===
+${COMMIT_HEAD}
+
+added text1
+
+===
+${COMMIT_HEAD}
+
+initial commit
+
+<<<
+
+> reset ${2}
+There is an untracked file in the way; delete it, or add and commit it first.
+<<<

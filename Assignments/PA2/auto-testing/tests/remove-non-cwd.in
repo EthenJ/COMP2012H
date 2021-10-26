@@ -1,0 +1,14 @@
+I tests/definitions.inc
+
+> init
+<<<
+
++ text1.txt text1.txt
+
+> add text1.txt
+<<<
+
+- text1.txt
+
+> rm text1.txt
+<<<

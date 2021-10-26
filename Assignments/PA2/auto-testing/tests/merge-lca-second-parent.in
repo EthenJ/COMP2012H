@@ -1,0 +1,81 @@
+I tests/definitions.inc
+
+> init
+<<<
+
++ text1.txt text1.txt
++ text2.txt text1.txt
+
+> add text1.txt
+<<<
+
+> add text2.txt
+<<<
+
+> commit "X|A"
+<<<
+
+> branch new
+<<<
+
++ text1.txt text2.txt
+
+> add text1.txt
+<<<
+
+> commit "Y|A"
+<<<
+
+> checkout new
+<<<
+
++ text2.txt text2.txt
+
+> add text2.txt
+<<<
+
+> commit "X|B"
+<<<
+
+> checkout master
+<<<
+
+> merge new
+<<<
+
+= text1.txt text2.txt
+= text2.txt text2.txt
+
+> checkout new
+<<<
+
++ text1.txt text2.txt
++ text2.txt text3.txt
+
+> add text1.txt
+<<<
+
+> add text2.txt
+<<<
+
+> commit "Y|C"
+<<<
+
+> checkout master
+<<<
+
++ text1.txt text1.txt
++ text2.txt text1.txt
+
+> add text1.txt
+<<<
+
+> add text2.txt
+<<<
+
+> commit "X|A"
+<<<
+
+> merge new
+Encountered a merge conflict.
+<<<

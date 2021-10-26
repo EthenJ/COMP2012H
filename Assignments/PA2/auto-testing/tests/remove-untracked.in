@@ -1,0 +1,12 @@
+I tests/definitions.inc
+
+> init
+<<<
+
++ text1.txt text1.txt
+
+> rm text1.txt
+No reason to remove the file.
+<<<
+
+E text1.txt

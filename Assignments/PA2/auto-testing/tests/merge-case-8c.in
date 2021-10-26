@@ -1,0 +1,35 @@
+I tests/definitions.inc
+
+> init
+<<<
+
+> branch new
+<<<
+
++ text1.txt text1.txt
+
+> add text1.txt
+<<<
+
+> commit "added text1"
+<<<
+
+> checkout new
+<<<
+
++ text1.txt text3.txt
+
+> add text1.txt
+<<<
+
+> commit "added text1.txt"
+<<<
+
+> checkout master
+<<<
+
+> merge new
+Encountered a merge conflict.
+<<<
+
+= text1.txt text1_3.txt

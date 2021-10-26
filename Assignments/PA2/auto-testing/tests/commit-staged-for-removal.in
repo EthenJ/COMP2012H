@@ -1,0 +1,20 @@
+I tests/definitions.inc
+
+> init
+<<<
+
++ text1.txt text1.txt
+
+> add text1.txt
+<<<
+
+> commit "added file1"
+<<<
+
+> rm text1.txt
+<<<
+
+> commit "removed file1"
+<<<
+
+* text1.txt
