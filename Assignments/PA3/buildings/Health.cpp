@@ -1,26 +1,19 @@
-#include "Health.h"
+#include "Health.h" /*Health.cpp*/
 
-Health::Health(City &city, const int &population_growth_rate_contribution) : Building(city)
-{
-    this->population_growth_rate_contribution = population_growth_rate_contribution;
-}
+Health::Health(City &city) : Building(city) {}
 
-Building::Category get_category()
+Building::Category Health::get_category() const
 {
     return Building::Category::HEALTH;
 }
-/*
-    virtual Building::Type get_type() const = 0;
 
-    virtual int get_cost() const = 0;
+int Health::get_population() const { return 0; }
 
-    virtual std::string get_long_information() const = 0;
+int Health::get_max_population() const { return 0; }
 
-    virtual std::string get_short_information() const = 0;
+int Health::get_revenue() const { return 0; }
 
-    virtual int get_revenue() const;
-    virtual int get_population() const;
-    virtual int get_max_population() const;
-    virtual int get_population_growth() const;
-    virtual int get_population_growth_rate_contribution() const;
-    virtual void increase_population(int population);*/
+int Health::get_population_growth() const { return 0; }
+
+/*do nothing*/
+void Health::increase_population(int population) {}

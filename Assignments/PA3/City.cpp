@@ -248,26 +248,26 @@ bool City::construct_at(Building::Type type, const Coordinates &coordinates)
         return false; // If the building cannot be constructed (with reasons mentioned above), then return false.
     }
     // Otherwise, construct the building by setting the grid pointer accordingly,
-    if(type==Building::Type::CLINIC){
-        // grid[coordinates.x][coordinates.y]=new ;
-
+    if (type == Building::Type::CLINIC)
+    {
+        grid[coordinates.x][coordinates.y]=new Clinic(*this);
     }
-    else if(type==Building::Type::HOSPITAL){
-
+    else if (type == Building::Type::HOSPITAL)
+    {
     }
-    else if(type==Building::Type::SILVER_MINE){
-
+    else if (type == Building::Type::SILVER_MINE)
+    {
     }
-    else if(type==Building::Type::GOLD_MINE){
-
+    else if (type == Building::Type::GOLD_MINE)
+    {
     }
-    else if(type==Building::Type::HOUSE){
-
+    else if (type == Building::Type::HOUSE)
+    {
     }
-    else if(type==Building::Type::APARTMENT){
-
+    else if (type == Building::Type::APARTMENT)
+    {
     }
-    
+
     // decrease budget and register neighboring buildings.
     return true;
 }
@@ -277,6 +277,33 @@ bool City::construct_at(Building::Type type, const Coordinates &coordinates)
  *Otherwise, demolish the building by setting the grid pointer accordingly and deregister neighboring buildings. Return true.*/
 bool City::demolish_at(const Coordinates &coordinates)
 {
+    if ((is_out_of_bound(coordinates.x, coordinates.y, grid_size)) && // Return false if the coordinates are out-of-bound
+        grid[coordinates.x][coordinates.y] == nullptr)                // grid cell is empty
+    {
+        return false;
+    }
+
+    /*deregister neighboring buildings*/
+    if (!is_out_of_bound(coordinates.x + 1, coordinates.y, grid_size))
+    {
+        grid[coordinates.x + 1][coordinates.y]->deregister_neighboring_building(grid[coordinates.x][coordinates.y]);
+    }
+    if (!is_out_of_bound(coordinates.x - 1, coordinates.y, grid_size))
+    {
+        grid[coordinates.x - 1][coordinates.y]->deregister_neighboring_building(grid[coordinates.x][coordinates.y]);
+    }
+    if (!is_out_of_bound(coordinates.x, coordinates.y + 1, grid_size))
+    {
+        grid[coordinates.x][coordinates.y + 1]->deregister_neighboring_building(grid[coordinates.x][coordinates.y]);
+    }
+    if (!is_out_of_bound(coordinates.x, coordinates.y - 1, grid_size))
+    {
+        grid[coordinates.x][coordinates.y - 1]->deregister_neighboring_building(grid[coordinates.x][coordinates.y]);
+    }
+
+    delete grid[coordinates.x][coordinates.y];
+    grid[coordinates.x][coordinates.y] = nullptr;
+    return true;
 }
 
 /*Proceeds to next turn by following the steps in Game Mechanics.*/
