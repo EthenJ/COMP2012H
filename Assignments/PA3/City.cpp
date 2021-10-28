@@ -244,31 +244,34 @@ bool City::can_construct(Building::Type type, const Coordinates &coordinates) co
 bool City::construct_at(Building::Type type, const Coordinates &coordinates)
 {
     if (!can_construct(type, coordinates))
-    {
         return false; // If the building cannot be constructed (with reasons mentioned above), then return false.
-    }
+
     // Otherwise, construct the building by setting the grid pointer accordingly,
     if (type == Building::Type::CLINIC)
-    {
-        grid[coordinates.x][coordinates.y]=new Clinic(*this);
-    }
+        grid[coordinates.x][coordinates.y] = new Clinic(*this);
     else if (type == Building::Type::HOSPITAL)
-    {
-    }
+        grid[coordinates.x][coordinates.y] = new Hospital(*this);
     else if (type == Building::Type::SILVER_MINE)
-    {
-    }
+        grid[coordinates.x][coordinates.y] = new SilverMine(*this);
     else if (type == Building::Type::GOLD_MINE)
-    {
-    }
+        grid[coordinates.x][coordinates.y] = new GoldMine(*this);
     else if (type == Building::Type::HOUSE)
-    {
-    }
+        grid[coordinates.x][coordinates.y] = new House(*this);
     else if (type == Building::Type::APARTMENT)
-    {
-    }
+        grid[coordinates.x][coordinates.y] = new Apartment(*this);
 
     // decrease budget and register neighboring buildings.
+    budget -= grid[coordinates.x][coordinates.y]->get_cost(); // decrease budget
+
+    // register neighboring buildings
+    if (!is_out_of_bound(coordinates.x + 1, coordinates.y, grid_size))
+        grid[coordinates.x + 1][coordinates.y]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
+    if (!is_out_of_bound(coordinates.x - 1, coordinates.y, grid_size))
+        grid[coordinates.x - 1][coordinates.y]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
+    if (!is_out_of_bound(coordinates.x, coordinates.y + 1, grid_size))
+        grid[coordinates.x][coordinates.y + 1]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
+    if (!is_out_of_bound(coordinates.x, coordinates.y - 1, grid_size))
+        grid[coordinates.x][coordinates.y - 1]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
     return true;
 }
 
@@ -279,27 +282,17 @@ bool City::demolish_at(const Coordinates &coordinates)
 {
     if ((is_out_of_bound(coordinates.x, coordinates.y, grid_size)) && // Return false if the coordinates are out-of-bound
         grid[coordinates.x][coordinates.y] == nullptr)                // grid cell is empty
-    {
         return false;
-    }
 
     /*deregister neighboring buildings*/
     if (!is_out_of_bound(coordinates.x + 1, coordinates.y, grid_size))
-    {
         grid[coordinates.x + 1][coordinates.y]->deregister_neighboring_building(grid[coordinates.x][coordinates.y]);
-    }
     if (!is_out_of_bound(coordinates.x - 1, coordinates.y, grid_size))
-    {
         grid[coordinates.x - 1][coordinates.y]->deregister_neighboring_building(grid[coordinates.x][coordinates.y]);
-    }
     if (!is_out_of_bound(coordinates.x, coordinates.y + 1, grid_size))
-    {
         grid[coordinates.x][coordinates.y + 1]->deregister_neighboring_building(grid[coordinates.x][coordinates.y]);
-    }
     if (!is_out_of_bound(coordinates.x, coordinates.y - 1, grid_size))
-    {
         grid[coordinates.x][coordinates.y - 1]->deregister_neighboring_building(grid[coordinates.x][coordinates.y]);
-    }
 
     delete grid[coordinates.x][coordinates.y];
     grid[coordinates.x][coordinates.y] = nullptr;
