@@ -249,7 +249,7 @@ bool City::construct_at(Building::Type type, const Coordinates &coordinates)
     }
     // Otherwise, construct the building by setting the grid pointer accordingly,
     if(type==Building::Type::CLINIC){
-        grid[coordinates.x][coordinates.y]=new ;
+        // grid[coordinates.x][coordinates.y]=new ;
 
     }
     else if(type==Building::Type::HOSPITAL){
