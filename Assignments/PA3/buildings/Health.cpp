@@ -15,4 +15,4 @@ int Health::get_revenue() const { return 0; }
 
 int Health::get_population_growth() const { return 0; }
 
-void Health::increase_population(int population) {/*do nothing*/}
+void Health::increase_population(int population) {} /*do nothing*/

@@ -10,7 +10,7 @@ protected:
     explicit Health(City &city);
 
 public:
-    ~Health();
+    ~Health() = default;
 
     Building::Category get_category() const;
 

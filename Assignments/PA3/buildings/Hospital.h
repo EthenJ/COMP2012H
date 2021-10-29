@@ -6,7 +6,7 @@ class Hospital : public Health
 {
 public:
     Hospital(City &city);
-    ~Hospital();
+    ~Hospital() = default;
 
     Building::Type get_type() const;
 

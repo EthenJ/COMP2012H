@@ -32,6 +32,10 @@ City::City(const std::string &filename)
 {
 }
 
+City::~City()
+{
+}
+
 /*Deallocates all dynamically allocated memory, including the memory of Building objects added to the city.*/
 City::~City()
 {
