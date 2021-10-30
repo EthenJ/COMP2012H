@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstring>
+#include <cmath>
 using namespace std;
 
 // // __________________0__1___2___3___4___5___6___7___8___9___10__11__12__13__14__15__16__17__18__19__20__21
@@ -27,7 +28,7 @@ public:
     }
     Char(const char &inchar)
     {
-        cerr << "inchar  " << inchar << endl;
+        // cerr << "inchar  " << inchar << endl;
         if (inchar == 'A' || inchar == 'a')
         {
             type = ABC::A;
@@ -107,7 +108,7 @@ private:
             delete[] list;
             list = new_list;
             len -= dif;
-            cout << len << endl;
+            // cerr << len << endl;
         }
         mergeChar(); // merge same char if exist
     }
@@ -123,6 +124,7 @@ private:
                 delete list[i + 1];
                 list[i + 1] = nullptr;
                 merged = true;
+                break;
             }
         }
         if (merged)
@@ -188,9 +190,7 @@ public:
                 n = 1;
             }
         }
-        cout << 1111 << endl;
         list[len - 1]->setNum(n); // the last one
-        cout << 1111 << endl;
         delete[] val_m;
     }
     ~String()
@@ -210,9 +210,9 @@ public:
 
     void print() const
     {
-        cout << "current step: " << depth << endl;
-        cout << "len: " << len << endl;
-        cout << "score: " << score / 10 << "." << score % 10 << endl;
+        cout << "* current step: " << depth;
+        cout << "  len: " << len;
+        cout << "  score: " << score / 10 << "." << score % 10 << endl;
         for (int i = 0; i < len; i++)
         {
             int num = list[i]->getNum(); // how many char
@@ -241,18 +241,28 @@ void printResult(const String *s)
 
 int main()
 {
-    char buffer[512];
-    cin >> buffer;
-    cout << buffer << endl;
-    String *arr[2048]{};
-    String *result[128]{};
+    char *input = new char[512];
+    cin >> input;
+    // cerr << input << endl;
     int res = 0;
-    arr[0] = new String(buffer);
+    String *origin = new String(input);
+    if (origin->getLen() > 10)
+    {
+        cout << "can not solve solve such a complicated problem :(" << endl;
+        return -1;
+    }
+    String **arr = new String *[int(pow(origin->getLen(), origin->getLen()))];
+    String **result = new String *[int(pow(origin->getLen(), origin->getLen()))];
+    String **highest = new String *[int(pow(origin->getLen(), origin->getLen()))];
+    arr[0] = origin;
+    delete[] input;
     cout << endl
          << "input: " << endl;
     arr[0]->print();
+    cout << endl;
 
-    for (int i = 0, j = 0; i <= j; i++)
+    int arrLen = 1;
+    for (int i = 0; i < arrLen; i++)
     {
         if (arr[i]->getLen() == 0)
         {
@@ -262,14 +272,13 @@ int main()
         {
             for (int m = 0; m < arr[i]->getLen(); m++)
             {
-                cout << "q";
-                arr[++j] = new String(arr[i], m);
-                cout << m;
+                // cerr << "q";
+                arr[arrLen++] = new String(arr[i], m);
+                // cerr << m;
             }
         }
     }
 
-    String *highest[128]{};
     int highestNum = 0;
     int highest_score = -1;
     for (int i = 0; i < res; i++)
@@ -286,9 +295,24 @@ int main()
         }
     }
 
-    cout << "There are " << highestNum << " solutions to get highest score" << endl;
+    cout << endl
+         << "There are " << highestNum << " solutions to get highest score" << endl;
     for (int i = 0; i < highestNum; i++)
     {
-        highest[i]->print();
+        printResult(highest[i]);
     }
+
+    delete[] result;
+    delete[] highest;
+    for (int i = 0; i < arrLen; i++)
+    {
+        delete arr[i];
+    }
+    delete[] arr;
+
+    cout << endl
+         << "Totally " << highestNum << " solutions" << endl
+         << endl;
+
+    cout << "The program did not crash" << endl;
 }
