@@ -2,15 +2,8 @@
 
 Hospital::Hospital(City &city) : Health(city) {}
 
-Building::Type Hospital::get_type() const
-{
-    return Building::Type::HOSPITAL;
-}
-
-int Hospital::get_cost() const
-{
-    return 500;
-}
+Building::Type Hospital::get_type() const { return Building::Type::HOSPITAL; }
+int Hospital::get_cost() const { return 500; }
 
 std::string Hospital::get_long_information() const
 {
