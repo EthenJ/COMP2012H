@@ -1,4 +1,6 @@
 #include "City.h" /*City.cpp*/
+#include <iostream>
+#include <fstream>
 
 /*Creates a new City.
  *Allocate the 2D array of grid cells with dimensions size by size.
@@ -6,22 +8,22 @@
  *Set grid size accordingly.
  *Set turn to 1.
  *Initially, the budget is $150. size is always greater than or equal to 1.*/
-City::City(int size)
+City::City(int size) : grid_size(size), turn(1), budget(150)
 {
     /*Allocate the 2D array of grid cells with dimensions size by size.*/
-    grid = new Building **[size];
-    for (int i = 0; i < size; i++)
+    grid = new Building **[grid_size];
+    for (int i = 0; i < grid_size; i++)
     {
-        grid[i] = new Building *[size];
+        grid[i] = new Building *[grid_size];
         /*Set all grid cells to nullptr*/
-        for (int j = 0; j < size; j++)
+        for (int j = 0; j < grid_size; j++)
         {
             grid[i][j] = nullptr;
         }
     }
-    grid_size = size; // Set grid size accordingly.
-    turn = 1;         // Set turn to 1.
-    budget = 1;       // Initially, the budget is $150.
+    // Set grid size accordingly.
+    // Set turn to 1.
+    // Initially, the budget is $150.
 }
 
 /*Loads a city from the file filename. See Save File Format for the format of the save file.
@@ -30,10 +32,81 @@ City::City(int size)
  *Don't forget to set neighbors when adding buildings to the city.*/
 City::City(const std::string &filename)
 {
+    using namespace std;
+    ifstream input_stream;
+    input_stream.open(filename, ios::in); // open the file (read-only)
+    if (!input_stream)
+    {
+        cerr << "Unable to open " + filename + " :(" << endl;
+        return;
+    }
+    /*The first three values are the grid size, budget and turns of the city.*/
+    string input_str;
+    getline(input_stream, input_str);
+    grid_size = atoi(input_str.c_str()); // grid size
+    getline(input_stream, input_str);
+    budget = atoi(input_str.c_str()); // budget
+    getline(input_stream, input_str);
+    turn = atoi(input_str.c_str()); // turn
+
+    /*Allocate the 2D array of grid cells with dimensions size by size.*/
+    grid = new Building **[grid_size];
+    for (int i = 0; i < grid_size; i++)
+    {
+        grid[i] = new Building *[grid_size];
+        /*Set all grid cells to nullptr*/
+        for (int j = 0; j < grid_size; j++)
+        {
+            grid[i][j] = nullptr;
+        }
+    }
+
+    Building::Type type;
+    Coordinates coordinates;
+    for (int i = 0; i < grid_size; i++)
+    {
+        for (int j = 0; j < grid_size; j++)
+        {
+            getline(input_stream, input_str);
+
+            /*If the grid cell has no building, save 0*/
+            if (input_str[0] == '0')
+            {
+                continue;
+            }
+            else
+            {
+                /*If the grid cell has a building, save the value in the Building::Type enum*/
+                type = Building::Type(input_str[0] - '0');
+                coordinates.x = i, coordinates.y = j;
+                construct_at(type, coordinates);
+                /*For Residential building, also store the population after a space.*/
+                if (grid[i][j]->get_category() == Building::Category::RESIDENTIAL)
+                {
+                    grid[i][j]->increase_population(atoi((input_str.erase(0, 2)).c_str()));
+                }
+            }
+        }
+    }
+
+    input_stream.close(); // close the file
 }
 
 City::~City()
 {
+    for (int i = 0; i < grid_size; i++)
+    {
+        for (int j = 0; j < grid_size; j++)
+        {
+            if (grid[i][j] != nullptr)
+            {
+                delete grid[i][j];
+                grid[i][j] = nullptr;
+            }
+        }
+        delete[] grid[i];
+    }
+    delete[] grid;
 }
 
 /*Deallocates all dynamically allocated memory, including the memory of Building objects added to the city.*/
@@ -57,24 +130,43 @@ City::~City()
  *If the file already exists, overwrite existing content. You can make use of the << operator.*/
 void City::save(const std::string &filename) const
 {
+    using namespace std;
+    ofstream output_stream;
+    output_stream.open(filename, ios::out | ios::trunc); // open the file (overwrite)
+    if (!output_stream)
+    {
+        cerr << "Unable to open " + filename + " :(" << endl;
+        return;
+    }
+    output_stream << to_string(grid_size) << endl;
+    output_stream << to_string(budget) << endl;
+    output_stream << to_string(turn) << endl;
+
+    for (int i = 0; i < grid_size; i++)
+    {
+        for (int j = 0; j < grid_size; j++)
+        {
+            output_stream << to_string(int(grid[i][j]->get_type()));
+            if (grid[i][j]->get_category() == Building::Category::RESIDENTIAL)
+            {
+                output_stream << " " + to_string(grid[i][j]->get_population());
+            }
+            output_stream << endl;
+        }
+    }
+
+    output_stream.close(); // close the file
 }
 
 // Returns the turn, budget and grid size of the city, respectively.
 /*Returns the turn*/
-int City::get_turn() const
-{
-    return turn;
-}
+int City::get_turn() const { return turn; }
+
 /*Returns the budget*/
-int City::get_budget() const
-{
-    return budget;
-}
+int City::get_budget() const { return budget; }
+
 /*Returns the grid size*/
-int City::get_grid_size() const
-{
-    return grid_size;
-}
+int City::get_grid_size() const { return grid_size; }
 
 /*Returns the corresponding attribute of the city.
  *  The revenue of the city is the sum of revenue of all buildings in the city.
@@ -306,4 +398,5 @@ bool City::demolish_at(const Coordinates &coordinates)
 /*Proceeds to next turn by following the steps in Game Mechanics.*/
 void City::move_to_next_turn()
 {
+    
 }
