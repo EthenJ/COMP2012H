@@ -343,13 +343,13 @@ bool City::construct_at(Building::Type type, const Coordinates &coordinates)
     budget -= grid[coordinates.x][coordinates.y]->get_cost(); // decrease budget
 
     // register neighboring buildings
-    if (!is_out_of_bound(coordinates.x + 1, coordinates.y, grid_size))
+    if (!is_out_of_bound(coordinates.x + 1, coordinates.y, grid_size) && grid[coordinates.x + 1][coordinates.y] != nullptr)
         grid[coordinates.x + 1][coordinates.y]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
-    if (!is_out_of_bound(coordinates.x - 1, coordinates.y, grid_size))
+    if (!is_out_of_bound(coordinates.x - 1, coordinates.y, grid_size) && grid[coordinates.x + 1][coordinates.y] != nullptr)
         grid[coordinates.x - 1][coordinates.y]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
-    if (!is_out_of_bound(coordinates.x, coordinates.y + 1, grid_size))
+    if (!is_out_of_bound(coordinates.x, coordinates.y + 1, grid_size) && grid[coordinates.x + 1][coordinates.y] != nullptr)
         grid[coordinates.x][coordinates.y + 1]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
-    if (!is_out_of_bound(coordinates.x, coordinates.y - 1, grid_size))
+    if (!is_out_of_bound(coordinates.x, coordinates.y - 1, grid_size) && grid[coordinates.x + 1][coordinates.y] != nullptr)
         grid[coordinates.x][coordinates.y - 1]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
     return true;
 }

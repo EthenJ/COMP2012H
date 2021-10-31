@@ -8,7 +8,7 @@
             "name": "make & debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${fileDirname}\\Lab5.exe",
+            "program": "${fileDirname}\\simplecity.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
