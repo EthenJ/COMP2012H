@@ -15,7 +15,8 @@ int Residential::get_population_growth() const
 {
     int population_growth = city.get_population_growth_rate() *
                             (number_neighboring_health_buildings() - number_neighboring_gold_mines()) / 10;
-    int limit = get_max_population() - get_population();
+    int limit = get_max_population() - population;
+
     if (population_growth < limit)
     {
         return population_growth;
@@ -27,12 +28,16 @@ int Residential::get_population_growth_rate_contribution() const { return -get_p
 
 void Residential::increase_population(int population)
 {
+    this->population += population;
+    /*If the new population exceeds the max population, set it to the max population.*/
     if (population > get_max_population())
     {
         this->population = get_max_population();
     }
-    else
+
+    /*If the new population is smaller than 0, set it to 0.*/
+    else if (this->population < 0)
     {
-        this->population += population;
+        this->population = 0;
     }
 }
