@@ -16,3 +16,6 @@ int Revenue::get_population_growth() const { return 0; }
 int Revenue::get_population_growth_rate_contribution() const { return 0; }
 
 void Revenue::increase_population(int population) {} /*do nothing*/
+
+/*virtual functions*/
+int Revenue::get_revenue() const {}

@@ -16,3 +16,6 @@ int Health::get_revenue() const { return 0; }
 int Health::get_population_growth() const { return 0; }
 
 void Health::increase_population(int population) {} /*do nothing*/
+
+/*virtual funcitons*/
+int Health::get_population_growth_rate_contribution() const {}
