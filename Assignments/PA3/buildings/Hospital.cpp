@@ -1,4 +1,4 @@
-#include "..\City.h" /*Hospital.cpp*/
+#include "Hospital.h" /*Hospital.cpp*/
 
 Hospital::Hospital(City &city) : Health(city) {}
 
