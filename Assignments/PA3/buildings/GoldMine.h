@@ -2,7 +2,8 @@
 #define GOLDMINE_H
 
 #include "Revenue.h"
-class GoldMine: public Revenue {
+class GoldMine : public Revenue
+{
 public:
     GoldMine(City &city);
     ~GoldMine() = default;

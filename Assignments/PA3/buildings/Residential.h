@@ -1,9 +1,11 @@
+#pragma once
+
 #ifndef RESIDENTIAL_H
 #define RESIDENTIAL_H
 
 #include "Building.h"
 #include "BuildingInformationFormatString.h"
-#include "City.h"
+// #include "..\City.h"
 class Residential : public Building
 {
 private:
@@ -24,5 +26,10 @@ public:
     int get_population_growth_rate_contribution() const;
     int get_population_growth() const;
     void increase_population(int population);
+
+    virtual Building::Type get_type() const = 0;
+    virtual int get_cost() const = 0;
+    virtual std::string get_long_information() const = 0;
+    virtual std::string get_short_information() const = 0;
 };
 #endif // RESIDENTIAL_H

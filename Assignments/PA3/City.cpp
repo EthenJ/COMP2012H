@@ -92,23 +92,6 @@ City::City(const std::string &filename)
     input_stream.close(); // close the file
 }
 
-City::~City()
-{
-    for (int i = 0; i < grid_size; i++)
-    {
-        for (int j = 0; j < grid_size; j++)
-        {
-            if (grid[i][j] != nullptr)
-            {
-                delete grid[i][j];
-                grid[i][j] = nullptr;
-            }
-        }
-        delete[] grid[i];
-    }
-    delete[] grid;
-}
-
 /*Deallocates all dynamically allocated memory, including the memory of Building objects added to the city.*/
 City::~City()
 {

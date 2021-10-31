@@ -1,4 +1,4 @@
-#include "SilverMine.h" /*SilverMine.cpp*/
+#include "..\City.h" /*SilverMine.cpp*/
 
 SilverMine::SilverMine(City &city) : Revenue(city) {}
 

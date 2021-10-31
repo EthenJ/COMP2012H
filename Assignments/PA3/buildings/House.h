@@ -2,7 +2,11 @@
 #define HOUSE_H
 
 #include "Residential.h"
-class House: public Residential {
+class House : public Residential
+{
+protected:
+    explicit House(City &city);
+
 public:
     explicit House(City &city);
     ~House() = default;

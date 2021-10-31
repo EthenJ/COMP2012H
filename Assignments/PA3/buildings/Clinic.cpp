@@ -1,4 +1,4 @@
-#include "Clinic.h" /*Clinic.cpp*/
+#include "..\City.h" /*Clinic.cpp*/
 
 Clinic::Clinic(City &city) : Health(city) {}
 
