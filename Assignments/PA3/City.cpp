@@ -30,7 +30,7 @@ City::City(int size) : grid_size(size), turn(1), budget(150)
  *You can assume the file always exists and the format is correct.
  *You can make use of the >> operator.
  *Don't forget to set neighbors when adding buildings to the city.*/
-City::City(const std::string &filename)
+City::City(const std::string &filename) : budget(66666666)
 {
     using namespace std;
     ifstream input_stream;
@@ -40,15 +40,16 @@ City::City(const std::string &filename)
         cerr << "Unable to open " + filename + " :(" << endl;
         return;
     }
+    // cerr << 1 << endl;
     /*The first three values are the grid size, budget and turns of the city.*/
     string input_str;
     getline(input_stream, input_str);
     grid_size = atoi(input_str.c_str()); // grid size
     getline(input_stream, input_str);
-    budget = atoi(input_str.c_str()); // budget
+    int new_budget = atoi(input_str.c_str()); // budget
     getline(input_stream, input_str);
     turn = atoi(input_str.c_str()); // turn
-
+    // cerr << 2 << endl;
     /*Allocate the 2D array of grid cells with dimensions size by size.*/
     grid = new Building **[grid_size];
     for (int i = 0; i < grid_size; i++)
@@ -60,7 +61,7 @@ City::City(const std::string &filename)
             grid[i][j] = nullptr;
         }
     }
-
+    // cerr << 3 << endl;
     Building::Type type;
     Coordinates coordinates;
     for (int i = 0; i < grid_size; i++)
@@ -72,23 +73,33 @@ City::City(const std::string &filename)
             /*If the grid cell has no building, save 0*/
             if (input_str[0] == '0')
             {
+                // cerr << 5 << endl;
                 continue;
             }
             else
             {
                 /*If the grid cell has a building, save the value in the Building::Type enum*/
+                // cerr << 6 << endl;
                 type = Building::Type(input_str[0] - '0');
                 coordinates.x = i, coordinates.y = j;
                 construct_at(type, coordinates);
                 /*For Residential building, also store the population after a space.*/
+                // cerr << 7 << endl;
+                // cerr << coordinates.x << coordinates.y << endl;
+                // if (grid[i][j] == nullptr)
+                // {
+                //     cerr << "gg" << endl;
+                // }
                 if (grid[i][j]->get_category() == Building::Category::RESIDENTIAL)
                 {
+                    // cerr << 8 << endl;
                     grid[i][j]->increase_population(atoi((input_str.erase(0, 2)).c_str()));
                 }
             }
         }
     }
 
+    budget = new_budget;
     input_stream.close(); // close the file
 }
 
@@ -345,11 +356,11 @@ bool City::construct_at(Building::Type type, const Coordinates &coordinates)
     // register neighboring buildings
     if (!is_out_of_bound(coordinates.x + 1, coordinates.y, grid_size) && grid[coordinates.x + 1][coordinates.y] != nullptr)
         grid[coordinates.x + 1][coordinates.y]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
-    if (!is_out_of_bound(coordinates.x - 1, coordinates.y, grid_size) && grid[coordinates.x + 1][coordinates.y] != nullptr)
+    if (!is_out_of_bound(coordinates.x - 1, coordinates.y, grid_size) && grid[coordinates.x - 1][coordinates.y] != nullptr)
         grid[coordinates.x - 1][coordinates.y]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
-    if (!is_out_of_bound(coordinates.x, coordinates.y + 1, grid_size) && grid[coordinates.x + 1][coordinates.y] != nullptr)
+    if (!is_out_of_bound(coordinates.x, coordinates.y + 1, grid_size) && grid[coordinates.x][coordinates.y + 1] != nullptr)
         grid[coordinates.x][coordinates.y + 1]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
-    if (!is_out_of_bound(coordinates.x, coordinates.y - 1, grid_size) && grid[coordinates.x + 1][coordinates.y] != nullptr)
+    if (!is_out_of_bound(coordinates.x, coordinates.y - 1, grid_size) && grid[coordinates.x][coordinates.y - 1] != nullptr)
         grid[coordinates.x][coordinates.y - 1]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
     return true;
 }
@@ -359,18 +370,18 @@ bool City::construct_at(Building::Type type, const Coordinates &coordinates)
  *Otherwise, demolish the building by setting the grid pointer accordingly and deregister neighboring buildings. Return true.*/
 bool City::demolish_at(const Coordinates &coordinates)
 {
-    if ((is_out_of_bound(coordinates.x, coordinates.y, grid_size)) && // Return false if the coordinates are out-of-bound
+    if ((is_out_of_bound(coordinates.x, coordinates.y, grid_size)) || // Return false if the coordinates are out-of-bound
         grid[coordinates.x][coordinates.y] == nullptr)                // grid cell is empty
         return false;
 
     /*deregister neighboring buildings*/
-    if (!is_out_of_bound(coordinates.x + 1, coordinates.y, grid_size))
+    if (!is_out_of_bound(coordinates.x + 1, coordinates.y, grid_size) && grid[coordinates.x + 1][coordinates.y] != nullptr)
         grid[coordinates.x + 1][coordinates.y]->deregister_neighboring_building(grid[coordinates.x][coordinates.y]);
-    if (!is_out_of_bound(coordinates.x - 1, coordinates.y, grid_size))
+    if (!is_out_of_bound(coordinates.x - 1, coordinates.y, grid_size) && grid[coordinates.x - 1][coordinates.y] != nullptr)
         grid[coordinates.x - 1][coordinates.y]->deregister_neighboring_building(grid[coordinates.x][coordinates.y]);
-    if (!is_out_of_bound(coordinates.x, coordinates.y + 1, grid_size))
+    if (!is_out_of_bound(coordinates.x, coordinates.y + 1, grid_size) && grid[coordinates.x][coordinates.y + 1] != nullptr)
         grid[coordinates.x][coordinates.y + 1]->deregister_neighboring_building(grid[coordinates.x][coordinates.y]);
-    if (!is_out_of_bound(coordinates.x, coordinates.y - 1, grid_size))
+    if (!is_out_of_bound(coordinates.x, coordinates.y - 1, grid_size) && grid[coordinates.x][coordinates.y - 1] != nullptr)
         grid[coordinates.x][coordinates.y - 1]->deregister_neighboring_building(grid[coordinates.x][coordinates.y]);
 
     delete grid[coordinates.x][coordinates.y];
