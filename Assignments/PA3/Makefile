@@ -34,7 +34,7 @@ $(OUT): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 $(ZIP_OUT): $(SUBMISSION)
-	$(RM) $(ZIP_OUT)
+	# $(RM) $(ZIP_OUT)
 	$(ZIP) $@ $^
 
 .PHONY: clean

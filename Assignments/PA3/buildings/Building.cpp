@@ -1,4 +1,4 @@
-#include "building.h" /*Building.cpp*/
+#include "Building.h" /*Building.cpp*/
 
 /* set reference of city*/
 Building::Building(City &city) : city(city) {}

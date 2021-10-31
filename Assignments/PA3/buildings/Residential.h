@@ -1,5 +1,3 @@
-#pragma once
-
 #ifndef RESIDENTIAL_H
 #define RESIDENTIAL_H
 
