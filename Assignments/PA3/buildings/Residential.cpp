@@ -7,8 +7,6 @@ Building::Category Residential::get_category() const
     return Building::Category::RESIDENTIAL;
 }
 
-int Residential::get_revenue() const { return 0; }
-
 int Residential::get_population() const { return population; }
 
 int Residential::get_population_growth() const

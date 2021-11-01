@@ -16,18 +16,11 @@ public:
     ~Residential() = default;
 
     Category get_category() const;
-    int get_revenue() const;
-    int get_population() const;
 
-    virtual int get_max_population() const = 0;
+    int get_population() const override;
 
-    int get_population_growth_rate_contribution() const;
-    int get_population_growth() const;
-    void increase_population(int population);
-
-    virtual Building::Type get_type() const = 0;
-    virtual int get_cost() const = 0;
-    virtual std::string get_long_information() const = 0;
-    virtual std::string get_short_information() const = 0;
+    int get_population_growth_rate_contribution() const override;
+    int get_population_growth() const override;
+    void increase_population(int population) override;
 };
 #endif // RESIDENTIAL_H

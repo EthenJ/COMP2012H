@@ -14,6 +14,6 @@ public:
     std::string get_long_information() const;
     std::string get_short_information() const;
 
-    int get_revenue() const;
+    int get_revenue() const override;
 };
 #endif // GOLDMINE_H

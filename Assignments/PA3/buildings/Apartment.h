@@ -14,6 +14,6 @@ public:
     std::string get_long_information() const;
     std::string get_short_information() const;
 
-    int get_max_population() const;
+    int get_max_population() const override;
 };
 #endif // APARTMENT_H
