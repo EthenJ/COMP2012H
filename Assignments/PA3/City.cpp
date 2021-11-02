@@ -259,7 +259,7 @@ inline bool is_out_of_bound(const int &x, const int &y, const int &size)
         return true; // the coordinates are out-of-bound
     }
     return false;
-};
+}
 
 /*Returns a pointer to the building at the grid cell specified by the coordinates.
  *Return nullptr if the cell has no buildings or the coordinates are out-of-bound.*/
