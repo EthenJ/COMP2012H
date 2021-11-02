@@ -73,26 +73,17 @@ City::City(const std::string &filename) : budget(66666666)
             /*If the grid cell has no building, save 0*/
             if (input_str[0] == '0')
             {
-                // cerr << 5 << endl;
                 continue;
             }
             else
             {
                 /*If the grid cell has a building, save the value in the Building::Type enum*/
-                // cerr << 6 << endl;
                 type = Building::Type(input_str[0] - '0');
                 coordinates.x = i, coordinates.y = j;
                 construct_at(type, coordinates);
                 /*For Residential building, also store the population after a space.*/
-                // cerr << 7 << endl;
-                // cerr << coordinates.x << coordinates.y << endl;
-                // if (grid[i][j] == nullptr)
-                // {
-                //     cerr << "gg" << endl;
-                // }
                 if (grid[i][j]->get_category() == Building::Category::RESIDENTIAL)
                 {
-                    // cerr << 8 << endl;
                     grid[i][j]->increase_population(atoi((input_str.erase(0, 2)).c_str()));
                 }
             }
@@ -140,10 +131,17 @@ void City::save(const std::string &filename) const
     {
         for (int j = 0; j < grid_size; j++)
         {
-            output_stream << to_string(int(grid[i][j]->get_type()));
-            if (grid[i][j]->get_category() == Building::Category::RESIDENTIAL)
+            if (grid[i][j] == nullptr)
             {
-                output_stream << " " + to_string(grid[i][j]->get_population());
+                output_stream << '0';
+            }
+            else
+            {
+                output_stream << to_string(static_cast<int>(grid[i][j]->get_type()));
+                if (grid[i][j]->get_category() == Building::Category::RESIDENTIAL)
+                {
+                    output_stream << " " + to_string(grid[i][j]->get_population());
+                }
             }
             output_stream << endl;
         }
@@ -299,7 +297,7 @@ const int cost_of_building[6] = {50, 500, 50, 400, 50, 300};
 /*Returns the cost of the given type of building*/
 inline int get_cost_of_building(const Building::Type &type)
 {
-    return cost_of_building[int(type) - 1];
+    return cost_of_building[static_cast<int>(type) - 1];
 }
 
 /*Returns whether the city has enough budget to construct the given type of building.*/
@@ -355,13 +353,25 @@ bool City::construct_at(Building::Type type, const Coordinates &coordinates)
 
     // register neighboring buildings
     if (!is_out_of_bound(coordinates.x + 1, coordinates.y, grid_size) && grid[coordinates.x + 1][coordinates.y] != nullptr)
+    {
         grid[coordinates.x + 1][coordinates.y]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
+        grid[coordinates.x][coordinates.y]->register_neighboring_building(grid[coordinates.x + 1][coordinates.y]);
+    }
     if (!is_out_of_bound(coordinates.x - 1, coordinates.y, grid_size) && grid[coordinates.x - 1][coordinates.y] != nullptr)
+    {
         grid[coordinates.x - 1][coordinates.y]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
+        grid[coordinates.x][coordinates.y]->register_neighboring_building(grid[coordinates.x - 1][coordinates.y]);
+    }
     if (!is_out_of_bound(coordinates.x, coordinates.y + 1, grid_size) && grid[coordinates.x][coordinates.y + 1] != nullptr)
+    {
         grid[coordinates.x][coordinates.y + 1]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
+        grid[coordinates.x][coordinates.y]->register_neighboring_building(grid[coordinates.x][coordinates.y + 1]);
+    }
     if (!is_out_of_bound(coordinates.x, coordinates.y - 1, grid_size) && grid[coordinates.x][coordinates.y - 1] != nullptr)
+    {
         grid[coordinates.x][coordinates.y - 1]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
+        grid[coordinates.x][coordinates.y]->register_neighboring_building(grid[coordinates.x][coordinates.y - 1]);
+    }
     return true;
 }
 
@@ -399,7 +409,10 @@ void City::move_to_next_turn()
     {
         for (int j = 0; j < grid_size; j++)
         {
-            budget += grid[i][j]->get_revenue();
+            if (grid[i][j] != nullptr)
+            {
+                budget += grid[i][j]->get_revenue();
+            }
         }
     }
     /*3. The population is increased by the following steps*/
@@ -416,7 +429,10 @@ void City::move_to_next_turn()
     {
         for (int j = 0; j < grid_size; j++)
         {
-            population_growth[i][j] = grid[i][j]->get_population_growth();
+            if (grid[i][j] != nullptr)
+            {
+                population_growth[i][j] = grid[i][j]->get_population_growth();
+            }
         }
     }
 
@@ -425,7 +441,16 @@ void City::move_to_next_turn()
     {
         for (int j = 0; j < grid_size; j++)
         {
-            grid[i][j]->increase_population(population_growth[i][j]);
+            if (grid[i][j] != nullptr)
+            {
+                grid[i][j]->increase_population(population_growth[i][j]);
+            }
         }
     }
+
+    for (int i = 0; i < grid_size; i++)
+    {
+        delete[] population_growth[i];
+    }
+    delete[] population_growth;
 }
