@@ -82,13 +82,45 @@ City::City(const std::string &filename) : budget(66666666)
             else
             {
                 /*If the grid cell has a building, save the value in the Building::Type enum*/
-                type = Building::Type(input_str[0] - '0');
+                type = static_cast<Building::Type>(input_str[0] - '0');
                 coordinates.x = i, coordinates.y = j;
-                construct_at(type, coordinates);
                 /*For Residential building, also store the population after a space.*/
-                if (grid[i][j]->get_category() == Building::Category::RESIDENTIAL)
+                if (type == Building::Type::APARTMENT || type == Building::Type::HOUSE)
                 {
-                    grid[i][j]->increase_population(atoi((input_str.erase(0, 2)).c_str()));
+                    if (type == Building::Type::APARTMENT)
+                    {
+                        grid[i][j] = new Apartment(*this, atoi((input_str.erase(0, 2)).c_str()));
+                    }
+                    else
+                    {
+                        grid[i][j] = new House(*this, atoi((input_str.erase(0, 2)).c_str()));
+                    }
+
+                    // register neighboring buildings
+                    if (!is_out_of_bound(coordinates.x + 1, coordinates.y, grid_size) && grid[coordinates.x + 1][coordinates.y] != nullptr)
+                    {
+                        grid[coordinates.x + 1][coordinates.y]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
+                        grid[coordinates.x][coordinates.y]->register_neighboring_building(grid[coordinates.x + 1][coordinates.y]);
+                    }
+                    if (!is_out_of_bound(coordinates.x - 1, coordinates.y, grid_size) && grid[coordinates.x - 1][coordinates.y] != nullptr)
+                    {
+                        grid[coordinates.x - 1][coordinates.y]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
+                        grid[coordinates.x][coordinates.y]->register_neighboring_building(grid[coordinates.x - 1][coordinates.y]);
+                    }
+                    if (!is_out_of_bound(coordinates.x, coordinates.y + 1, grid_size) && grid[coordinates.x][coordinates.y + 1] != nullptr)
+                    {
+                        grid[coordinates.x][coordinates.y + 1]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
+                        grid[coordinates.x][coordinates.y]->register_neighboring_building(grid[coordinates.x][coordinates.y + 1]);
+                    }
+                    if (!is_out_of_bound(coordinates.x, coordinates.y - 1, grid_size) && grid[coordinates.x][coordinates.y - 1] != nullptr)
+                    {
+                        grid[coordinates.x][coordinates.y - 1]->register_neighboring_building(grid[coordinates.x][coordinates.y]);
+                        grid[coordinates.x][coordinates.y]->register_neighboring_building(grid[coordinates.x][coordinates.y - 1]);
+                    }
+                }
+                else
+                {
+                    construct_at(type, coordinates);
                 }
             }
         }

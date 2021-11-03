@@ -10,7 +10,7 @@ private:
     int population;
 
 protected:
-    explicit Residential(City &city);
+    explicit Residential(City &city, const int &population);
 
 public:
     ~Residential() = default;

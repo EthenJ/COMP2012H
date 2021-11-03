@@ -1,6 +1,6 @@
 #include "../City.h" /*Residential.cpp*/
 
-Residential::Residential(City &city) : Building(city), population(0) {}
+Residential::Residential(City &city, const int &population) : Building(city), population(population) {}
 
 Building::Category Residential::get_category() const
 {

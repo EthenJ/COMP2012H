@@ -1,6 +1,6 @@
 #include "House.h" /*House.cpp*/
 
-House::House(City &city) : Residential(city) {}
+House::House(City &city, const int &population) : Residential(city, population) {}
 
 Building::Type House::get_type() const { return Building::Type::HOUSE; }
 int House::get_cost() const { return 50; }
