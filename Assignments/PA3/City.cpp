@@ -30,6 +30,16 @@ City::City(int size) : grid_size(size), turn(1), budget(150)
     // Initially, the budget is $150.
 }
 
+/*Check whether the provided coordinates are out-of-bound*/
+inline bool is_out_of_bound(const int &x, const int &y, const int &size)
+{
+    if (x < 0 || x >= size || y < 0 || y >= size)
+    {
+        return true; // the coordinates are out-of-bound
+    }
+    return false;
+}
+
 /*Loads a city from the file filename. See Save File Format for the format of the save file.
  *You can assume the file always exists and the format is correct.
  *You can make use of the >> operator.
@@ -285,16 +295,6 @@ int City::get_population_growth_rate() const
         }
     }
     return population_growth_rate;
-}
-
-/*Check whether the provided coordinates are out-of-bound*/
-inline bool is_out_of_bound(const int &x, const int &y, const int &size)
-{
-    if (x < 0 || x >= size || y < 0 || y >= size)
-    {
-        return true; // the coordinates are out-of-bound
-    }
-    return false;
 }
 
 /*Returns a pointer to the building at the grid cell specified by the coordinates.

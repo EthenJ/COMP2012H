@@ -5,7 +5,8 @@
 class House : public Residential
 {
 public:
-    explicit House(City &city, const int &population = 0);
+    explicit House(City &city);
+    explicit House(City &city, const int &population);
     ~House() = default;
 
     Building::Type get_type() const;
