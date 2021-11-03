@@ -8,7 +8,7 @@
  *Set grid size accordingly.
  *Set turn to 1.
  *Initially, the budget is $150. size is always greater than or equal to 1.*/
-City::City(int size) : grid_size(size), turn(1), budget(150)
+City::City(int size) : grid_size(size), budget(150), turn(1)
 {
     if (grid_size < 1)
     {
@@ -198,13 +198,22 @@ void City::save(const std::string &filename) const
 
 // Returns the turn, budget and grid size of the city, respectively.
 /*Returns the turn*/
-int City::get_turn() const { return turn; }
+int City::get_turn() const
+{
+    return turn;
+}
 
 /*Returns the budget*/
-int City::get_budget() const { return budget; }
+int City::get_budget() const
+{
+    return budget;
+}
 
 /*Returns the grid size*/
-int City::get_grid_size() const { return grid_size; }
+int City::get_grid_size() const
+{
+    return grid_size;
+}
 
 /*Returns the corresponding attribute of the city.
  *  The revenue of the city is the sum of revenue of all buildings in the city.
