@@ -10,6 +10,10 @@
  *Initially, the budget is $150. size is always greater than or equal to 1.*/
 City::City(int size) : grid_size(size), turn(1), budget(150)
 {
+    if (grid_size < 1)
+    {
+        grid_size = 1;
+    }
     /*Allocate the 2D array of grid cells with dimensions size by size.*/
     grid = new Building **[grid_size];
     for (int i = 0; i < grid_size; i++)
