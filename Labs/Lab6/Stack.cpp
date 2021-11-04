@@ -4,7 +4,7 @@
 /*Inserts data at the front.*/
 void Stack::push(int data)
 {
-    List::insertAt(data, 0);
+    Deque::push_front(data);
 }
 
 /*Removes the first item at the front.*/

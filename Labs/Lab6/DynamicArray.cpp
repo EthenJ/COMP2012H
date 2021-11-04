@@ -4,9 +4,9 @@
 /*Initializes the dynamic array such that it contains the same contents as array.*/
 DynamicArray::DynamicArray(int array[], int size)
 {
-    for (int i = size - 1; i >= 0; i--)
+    for (int i = 0; i < size; i++)
     {
-        List::insertAt(array[i], 0);
+        List::insertAt(array[i], i);
     }
 }
 

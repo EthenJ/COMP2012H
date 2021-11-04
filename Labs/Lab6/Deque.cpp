@@ -4,7 +4,15 @@
 /*Inserts data at the front.*/
 void Deque::push_front(int data)
 {
-    List::insertAt(data, 0);
+    if (empty())
+    {
+        List::insertAt(-1, 0);
+    }
+    else
+    {
+        List::insertAt(List::get(0), 0);
+    }
+    List::set(0, data);
 }
 
 /*Inserts data at the back.*/

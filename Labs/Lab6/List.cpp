@@ -31,15 +31,15 @@ List &List::assign(const List &rhs)
         next_node = this_node->next;
         delete this_node;
     }
-    head = nullptr;
+
     if (rhs.empty())
     {
         return *this;
     }
     // perform deep copy
-    for (int i = rhs.size() - 1; i >= 0; i--)
+    for (int i = 0; i < rhs.size(); i++)
     {
-        insertAt(rhs.get(i), 0);
+        insertAt(rhs.get(i), i);
     }
 
     /*return the current object as a reference.*/
@@ -80,6 +80,11 @@ void List::print() const
 /*Inserts a new node containing data such that it becomes the index-th node.*/
 void List::insertAt(int data, int index)
 {
+    if (index < 0 && !empty())
+    {
+        return;
+    }
+
     // insert the new Node such that it is at position = index
     Node *this_node = new Node(data);
     this_node->next = nullptr;
@@ -89,16 +94,9 @@ void List::insertAt(int data, int index)
         return;
     }
 
-    if (index == 0)
-    {
-        this_node->next = head;
-        head = this_node;
-        return;
-    }
-
     int node_num = 0;
     Node *previous_node = head;
-    for (; node_num < index && previous_node != nullptr; node_num++)
+    for (; node_num < index - 1 && previous_node != nullptr; node_num++)
     {
         previous_node = previous_node->next;
     }
@@ -106,7 +104,10 @@ void List::insertAt(int data, int index)
     {
         this_node->next = previous_node->next;
     }
-    previous_node->next = this_node;
+    if (previous_node != this_node)
+    {
+        previous_node->next = this_node;
+    }
 }
 
 /*Removes the index-th node.*/
@@ -133,6 +134,7 @@ void List::removeAt(int index)
             Node *this_node = previous_node->next;
             previous_node->next = this_node->next;
             delete this_node;
+            this_node = nullptr;
         }
     }
 }
