@@ -4,13 +4,13 @@
 /*Inserts data at the front.*/
 void Deque::push_front(int data)
 {
-    List::set(0, data);
+    List::insertAt(data, 0);
 }
 
 /*Inserts data at the back.*/
 void Deque::push_back(int data)
 {
-    List::set(List::size() - 1, data);
+    List::insertAt(data, List::size() - 1);
 }
 
 /*Removes the first item at the front.*/
@@ -25,7 +25,7 @@ void Deque::pop_back()
     List::removeAt(List::size() - 1);
 }
 
-/*Removes the last item at the back.*/
+/*Returns the first item, without changing the queue. If the queue is empty already, prints Empty! and return 0.*/
 int Deque::peek_front() const
 {
     if (List::empty())

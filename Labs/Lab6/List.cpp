@@ -31,9 +31,10 @@ List &List::assign(const List &rhs)
         next_node = this_node->next;
         delete this_node;
     }
+    head = nullptr;
     if (rhs.empty())
     {
-        return;
+        return *this;
     }
     // perform deep copy
     for (int i = rhs.size() - 1; i >= 0; i--)
@@ -82,6 +83,12 @@ void List::insertAt(int data, int index)
     // insert the new Node such that it is at position = index
     Node *this_node = new Node(data);
     this_node->next = nullptr;
+    if (empty())
+    {
+        head = this_node;
+        return;
+    }
+
     if (index == 0)
     {
         this_node->next = head;
@@ -91,7 +98,7 @@ void List::insertAt(int data, int index)
 
     int node_num = 0;
     Node *previous_node = head;
-    for (; node_num < index - 1 && previous_node != nullptr; node_num++)
+    for (; node_num < index && previous_node != nullptr; node_num++)
     {
         previous_node = previous_node->next;
     }
@@ -105,24 +112,28 @@ void List::insertAt(int data, int index)
 /*Removes the index-th node.*/
 void List::removeAt(int index)
 {
-    if (index == 0)
+    if (!empty())
     {
-        head = head->next;
-        delete head;
-        return;
-    }
+        if (index == 0)
+        {
+            Node *head_next = head->next;
+            delete head;
+            head = head_next;
+            return;
+        }
 
-    int node_num = 0;
-    Node *previous_node = head;
-    for (; node_num < index - 1 && previous_node != nullptr; node_num++)
-    {
-        previous_node = previous_node->next;
-    }
-    if (previous_node->next != nullptr)
-    {
-        Node *this_node = previous_node->next;
-        previous_node->next = this_node->next;
-        delete this_node;
+        int node_num = 0;
+        Node *previous_node = head;
+        for (; node_num < index - 1 && previous_node != nullptr; node_num++)
+        {
+            previous_node = previous_node->next;
+        }
+        if (previous_node->next != nullptr)
+        {
+            Node *this_node = previous_node->next;
+            previous_node->next = this_node->next;
+            delete this_node;
+        }
     }
 }
 

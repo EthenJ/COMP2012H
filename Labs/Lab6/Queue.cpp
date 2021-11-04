@@ -1,22 +1,30 @@
 #include "Queue.h"
 #include <iostream>
 
-void Queue::push(int data) {
-    // TODO
+/*Inserts data at the back.*/
+void Queue::push(int data)
+{
+    List::insertAt(data, List::size() - 1);
 }
 
-void Queue::pop() {
-    // TODO
+/*Removes the first item at the front.*/
+void Queue::pop()
+{
+    List::removeAt(0);
 }
 
-int Queue::peek() const {
-    // TODO
+/*Returns the first item, without changing the queue. If the queue is empty already, prints Empty! and return 0.*/
+int Queue::peek() const
+{
+    return Deque::peek_front();
 }
 
-void Queue::print() const {
-    std::cout << "Queue | Empty: " << (empty() ? "Y" : "N") << " | Size: " << size() <<" | ";
-    for(int i = 0; i < size(); i++) {
+void Queue::print() const
+{
+    std::cout << "Queue | Empty: " << (empty() ? "Y" : "N") << " | Size: " << size() << " | ";
+    for (int i = 0; i < size(); i++)
+    {
         std::cout << "<" << get(i) << "]";
-    }    
-    std::cout << std::endl;    
+    }
+    std::cout << std::endl;
 }
