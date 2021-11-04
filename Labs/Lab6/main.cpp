@@ -11,17 +11,17 @@ int main() {
     int arr[4] = {1, 2, 3, 4};
     DynamicArray array(arr, 4);
     array.print();
-    std::cout<<"Random access: "<<array[0]<<" "<<array[1]<<" "<<array[2]<<" "<<array[3]<<"\n";
+    std::cout << "Nodes: " << array.get(0) << " " << array.get(1) << " " << array.get(2) << " " << array.get(3) << "\n";
     DynamicArray array2(array);
     array2.print();
     DynamicArray array3 = array;
-    array3[0] = 7;
+    array3.set(0, 7);
     array3.print();
-    array3[1] = 8;
+    array3.set(1, 8);
     array3.print();
-    array3[2] = 9;
+    array3.set(2, 9);
     array3.print();
-    array3[3] = 10;
+    array3.set(3, 10);
     array3.print();
     array3.push_back(11);
     array3.print();
@@ -41,33 +41,8 @@ int main() {
     deque.print();
     deque.pop_back();
     deque.print();
-    std::cout<<"Peek front: "<<deque.peek_front()<<"\n";
-    std::cout<<"Peek back: "<<deque.peek_back()<<"\n";
-
-    // Queue
-    Queue queue;
-    queue.print();
-    queue.push(0);
-    queue.print();
-    queue.push(1);
-    queue.print();
-    queue.push(2);
-    queue.print();
-    queue.push(3);
-    queue.print();
-    queue.push(4);
-    queue.print();
-    queue.pop();
-    queue.print();
-    queue.pop();
-    queue.print();
-    queue.pop();
-    queue.print();
-    queue.pop();
-    queue.print();
-    queue.pop();
-    queue.print();
-    std::cout<<"Peek: "<<queue.peek()<<"\n";
+    std::cout << "Peek front: " << deque.peek_front() << "\n";
+    std::cout << "Peek back: " << deque.peek_back() << "\n";
 
     // Stack
     Stack stack;
@@ -92,6 +67,31 @@ int main() {
     stack.print();
     stack.pop();
     stack.print();
-    std::cout<<"Peek: "<<queue.peek()<<"\n";
-    std::cout<<"End";
+    std::cout << "Peek: " << stack.top() << std::endl;
+
+    // Queue
+    Queue queue;
+    queue.print();
+    queue.push(0);
+    queue.print();
+    queue.push(1);
+    queue.print();
+    queue.push(2);
+    queue.print();
+    queue.push(3);
+    queue.print();
+    queue.push(4);
+    queue.print();
+    queue.pop();
+    queue.print();
+    queue.pop();
+    queue.print();
+    queue.pop();
+    queue.print();
+    queue.pop();
+    queue.print();
+    queue.pop();
+    queue.print();
+    std::cout << "Peek: " << queue.peek() << std::endl;
+    std::cout << "End" << std::endl;
 }
