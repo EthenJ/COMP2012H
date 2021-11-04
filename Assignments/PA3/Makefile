@@ -8,7 +8,7 @@ SRCS := main_cli.cpp GameEngine.cpp City.cpp buildings\Building.cpp buildings\He
 SUBMISSION := City.cpp buildings\Building.cpp buildings\Health.cpp buildings\Revenue.cpp buildings\Residential.cpp buildings\Clinic.cpp buildings\Hospital.cpp buildings\SilverMine.cpp buildings\GoldMine.cpp buildings\House.cpp buildings\Apartment.cpp buildings\Health.h buildings\Revenue.h buildings\Residential.h buildings\Clinic.h buildings\Hospital.h buildings\SilverMine.h buildings\GoldMine.h buildings\House.h buildings\Apartment.h
 ZIP := zip.exe
 CXX := g++
-CXXFLAGS := -std=c++11 -Wall -Wextra -pedantic -Iinclude
+CXXFLAGS := -std=c++11 -Wall -Wextra -pedantic -Iinclude -g
 LDFLAGS :=
 
 OBJS := $(patsubst %.cpp,%.o,$(SRCS))
