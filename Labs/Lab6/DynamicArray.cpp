@@ -2,7 +2,7 @@
 #include <iostream>
 
 /*Initializes the dynamic array such that it contains the same contents as array.*/
-DynamicArray::DynamicArray(int array[], int size)
+DynamicArray::DynamicArray(int array[], int size) : List()
 {
     for (int i = 0; i < size; i++)
     {
@@ -25,7 +25,7 @@ void DynamicArray::set(int index, int data)
 /*Inserts new value data at the back.*/
 void DynamicArray::push_back(int data)
 {
-    List::insertAt(data, List::size() - 1);
+    List::insertAt(data, List::size());
 }
 
 void DynamicArray::print() const

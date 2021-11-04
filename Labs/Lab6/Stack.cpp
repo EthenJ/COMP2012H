@@ -16,7 +16,7 @@ void Stack::pop()
 /*Returns the first item, without changing the queue. If the queue is empty already, prints Empty! and return 0.*/
 int Stack::top() const
 {
-    return Deque::peek_back();
+    return Deque::peek_front();
 }
 
 void Stack::print() const

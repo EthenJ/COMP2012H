@@ -4,7 +4,7 @@
 /*Inserts data at the back.*/
 void Queue::push(int data)
 {
-    List::insertAt(data, List::size() - 1);
+    Deque::push_back(data);
 }
 
 /*Removes the first item at the front.*/

@@ -6,7 +6,7 @@ List::Node::Node(int data) : data(data), next(nullptr){};
 List::List() : head(nullptr){};
 
 /*Initializes the list as a copy of rhs, by deep-copying every Node.*/
-List::List(const List &rhs)
+List::List(const List &rhs) : head(nullptr)
 {
     assign(rhs);
 };
@@ -26,10 +26,14 @@ List::~List()
 List &List::assign(const List &rhs)
 {
     /*Delete the existing array / nodes.*/
-    for (Node *this_node = head, *next_node; this_node != nullptr; this_node = next_node)
+    if (!empty())
     {
-        next_node = this_node->next;
-        delete this_node;
+        for (Node *this_node = head, *next_node; this_node != nullptr; this_node = next_node)
+        {
+            next_node = this_node->next;
+            delete this_node;
+        }
+        head = nullptr;
     }
 
     if (rhs.empty())

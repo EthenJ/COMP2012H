@@ -18,7 +18,7 @@ void Deque::push_front(int data)
 /*Inserts data at the back.*/
 void Deque::push_back(int data)
 {
-    List::insertAt(data, List::size() - 1);
+    List::insertAt(data, List::size());
 }
 
 /*Removes the first item at the front.*/
