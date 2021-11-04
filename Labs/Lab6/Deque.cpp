@@ -1,33 +1,59 @@
 #include "Deque.h"
 #include <iostream>
 
-void Deque::push_front(int data) {
-    // TODO
+/*Inserts data at the front.*/
+void Deque::push_front(int data)
+{
+    List::set(0, data);
 }
 
-void Deque::push_back(int data) {
-    // TODO
+/*Inserts data at the back.*/
+void Deque::push_back(int data)
+{
+    List::set(List::size() - 1, data);
 }
 
-void Deque::pop_front() {
-    // TODO
+/*Removes the first item at the front.*/
+void Deque::pop_front()
+{
+    List::removeAt(0);
 }
 
-void Deque::pop_back() {
-    // TODO
+/*Removes the last item at the back.*/
+void Deque::pop_back()
+{
+    List::removeAt(List::size() - 1);
 }
 
-int Deque::peek_front() const {
-    // TODO
+/*Removes the last item at the back.*/
+int Deque::peek_front() const
+{
+    if (List::empty())
+    {
+        std::cout << "Empty!" << std::endl;
+        return 0;
+    }
+
+    return List::get(0);
 }
 
-int Deque::peek_back() const {
-    // TODO
+/*Returns the last item, without changing the queue. If the queue is empty already, prints Empty! and return 0.*/
+int Deque::peek_back() const
+{
+    if (List::empty())
+    {
+        std::cout << "Empty!" << std::endl;
+        return 0;
+    }
+
+    return List::get(List::size() - 1);
 }
 
-void Deque::print() const {
+void Deque::print() const
+{
     std::cout << "Deque | Empty: " << (empty() ? "Y" : "N") << " | Size: " << size() << " | ";
-    for (int i = 0; i < size(); i++) {
+    for (int i = 0; i < size(); i++)
+    {
         std::cout << "<" << get(i) << ">";
     }
     std::cout << std::endl;
