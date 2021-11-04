@@ -25,7 +25,7 @@ void DynamicArray::set(int index, int data)
 /*Inserts new value data at the back.*/
 void DynamicArray::push_back(int data)
 {
-    List::set(List::size() - 1, data);
+    List::insertAt(data, List::size() - 1);
 }
 
 void DynamicArray::print() const
