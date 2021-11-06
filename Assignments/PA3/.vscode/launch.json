@@ -8,14 +8,13 @@
             "name": "make & debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${fileDirname}\\simplecity.exe",
+            "program": "${fileDirname}\\simplecity",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "miDebuggerPath": "C:\\msys64\\mingw64\\bin\\gdb.exe",
             "setupCommands": [
                 {
                     "description": "为 gdb 启用整齐打印",

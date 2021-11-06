@@ -51,7 +51,8 @@ City::City(const std::string &filename) : budget(66666666)
     input_stream.open(filename, ios::in); // open the file (read-only)
     if (!input_stream)
     {
-        cerr << "Unable to open " + filename + " :(" << endl;
+        // cerr << "Unable to open " + filename + " :(" << endl;
+        grid_size = 0, budget = 150, turn = 1;
         return;
     }
     // cerr << 1 << endl;
@@ -150,11 +151,14 @@ City::~City()
             if (grid[i][j] != nullptr)
             {
                 delete grid[i][j]; // memory of Building objects added to the city
+                grid[i][j] = nullptr;
             }
         }
         delete[] grid[i];
+        grid[i] = nullptr;
     }
     delete[] grid;
+    grid = nullptr;
 }
 
 /*Saves the city to a file such that it can be loaded later.
@@ -496,6 +500,8 @@ void City::move_to_next_turn()
     for (int i = 0; i < grid_size; i++)
     {
         delete[] population_growth[i];
+        population_growth[i] = nullptr;
     }
     delete[] population_growth;
+    population_growth = nullptr;
 }
